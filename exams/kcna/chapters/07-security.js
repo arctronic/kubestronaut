@@ -373,7 +373,7 @@ echo 'UzNjcjN0' | base64 -d
 
   glossary: [
     { term: '4Cs', def: 'Cloud, Cluster, Container, Code: the layered model of cloud native security.' },
-    { term: 'ServiceAccount', def: 'Namespaced identity for processes in Pods; username system:serviceaccount:&lt;ns&gt;:&lt;name&gt;.' },
+    { term: 'ServiceAccount', def: 'Namespaced identity for processes in Pods; username system:serviceaccount:NAMESPACE:NAME.' },
     { term: 'Projected token', def: 'Short-lived, audience-bound ServiceAccount token from the TokenRequest API, mounted into Pods and rotated by the kubelet.' },
     { term: 'OIDC', def: 'OpenID Connect: lets the API server trust ID tokens from an external identity provider for user login.' },
     { term: 'RBAC', def: 'Role-Based Access Control: authorizes API requests using Roles/ClusterRoles bound to subjects.' },
