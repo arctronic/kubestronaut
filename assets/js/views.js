@@ -341,7 +341,7 @@
         btns.forEach((b, k) => { b.disabled = true; const oi = order[k]; if (ans.includes(oi)) b.classList.add('correct'); else if (picked.has(oi)) b.classList.add('wrong'); });
         if (ok) correct++; else missed.push({ q, picked: [...picked] });
         KS.store.recordAnswer(e.id, q.id, ok); KS.store.save();
-        exp.appendChild(h('div', { class: 'explain', html: `<div class="verdict ${ok ? 'ok' : 'bad'}">${ok ? '✓ Correct' : '✗ Incorrect'}</div>${q.explain || ''}` }));
+        exp.appendChild(h('div', { class: 'explain', html: `<div class="verdict ${ok ? 'ok' : 'bad'}">${ok ? '✓ Correct' : '✗ Incorrect'}</div>${q.explain || ''}${KS.refHtml(q)}` }));
         checkBtn.style.display = 'none'; nextBtn.style.display = ''; nextBtn.focus();
       }
       const d = e.domainById[q.domain] || {};
@@ -383,7 +383,7 @@
       h('div', { class: 'q-meta' }, h('span', { class: 'row', style: { gap: '8px' } }, num ? h('b', { text: '#' + num }) : null, h('span', { class: 'chip ' + (ok ? 'ok' : picked.length ? 'bad' : 'warn'), text: ok ? 'Correct' : picked.length ? 'Incorrect' : 'Unanswered' })), h('span', { class: 'chip', style: { color: KS.color(d.color) }, text: d.name || '' })),
       h('div', { class: 'q-text', html: q.q }),
       order.map((oi, k) => h('div', { class: 'opt' + (ans.includes(oi) ? ' correct' : picked.includes(oi) ? ' wrong' : ''), html: `<span class="key">${String.fromCharCode(65 + k)}</span><span>${q.options[oi]}${picked.includes(oi) ? ' <span class="muted small">(your answer)</span>' : ''}</span>` })),
-      h('div', { class: 'explain', html: q.explain || '' }));
+      h('div', { class: 'explain', html: (q.explain || '') + KS.refHtml(q) }));
   }
 
   /* ---------------- MOCK EXAM ---------------- */
@@ -657,7 +657,7 @@
           h('h3', { text: `${c.icon || ''} Ch ${c.num} · ${c.title}` }),
           h('ul', { class: 'small', style: { paddingLeft: '18px', color: 'var(--text-2)' } }, (c.summary || []).map((x) => h('li', { html: x }))),
           (c.glossary || []).length ? h('details', null, h('summary', { class: 'small', style: { cursor: 'pointer', fontWeight: 600 }, text: `${c.glossary.length} key terms` }),
-            h('dl', { class: 'small' }, c.glossary.map((g) => [h('dt', { style: { fontWeight: 700, marginTop: '6px' }, html: g.term }), h('dd', { style: { margin: 0, color: 'var(--text-2)' }, html: g.def })]))) : null))))))));
+            h('dl', { class: 'small' }, c.glossary.map((g) => [h('dt', { style: { fontWeight: 700, marginTop: '6px' }, html: g.term }), h('dd', { style: { margin: 0, color: 'var(--text-2)' }, html: g.def })]))) : null)))))));
   }));
 
   KS.route('/exam/:id/lib/:i', ({ id, i }) => getExam(id).then((e) => {

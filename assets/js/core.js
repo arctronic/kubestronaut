@@ -149,6 +149,21 @@
   };
   KS.shuffle = function (arr, rand) { rand = rand || Math.random; const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   KS.fmtTime = function (sec) { sec = Math.max(0, Math.round(sec)); const m = Math.floor(sec / 60), s = sec % 60; return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0'); };
+  /** Official source link(s) for a question, rendered under its explanation. */
+  KS.refLabel = function (url) {
+    try {
+      const u = new URL(url);
+      const host = u.hostname.replace(/^www\./, '');
+      const parts = u.pathname.split('/').filter(Boolean).filter((x) => !/^(docs|en|latest|stable|blob|main|master|tree)$/.test(x));
+      const last = (parts.pop() || '').replace(/\.md$/, '').replace(/[-_]/g, ' ');
+      return last ? host + ' › ' + last : host;
+    } catch (_) { return url; }
+  };
+  KS.refHtml = function (q) {
+    const refs = Array.isArray(q.ref) ? q.ref : q.ref ? [q.ref] : [];
+    if (!refs.length) return '';
+    return '<div class="ref">📖 Source: ' + refs.map((u) => `<a href="${KS.esc(u)}" target="_blank" rel="noopener">${KS.esc(KS.refLabel(u))} ↗</a>`).join(' · ') + '</div>';
+  };
   KS.toast = function (msg) { const t = KS.h('div', { class: 'toast', text: msg }); document.body.appendChild(t); setTimeout(() => t.remove(), 2200); };
   KS.ring = function (pct, color, size) {
     size = size || 150; const r = size / 2 - 10, c = 2 * Math.PI * r, off = c * (1 - Math.max(0, Math.min(1, pct / 100)));

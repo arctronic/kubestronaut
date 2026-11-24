@@ -1,0 +1,10 @@
+{
+  "name": "kubestronaut",
+  "private": true,
+  "description": "Study hub for the five Kubestronaut certifications",
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "validate": "node tools/validate.js kcna",
+    "test": "node tools/validate.js kcna && node tests/e2e.js"
+  }
+}

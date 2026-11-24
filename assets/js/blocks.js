@@ -314,7 +314,7 @@
       bt.addEventListener('click', () => {
         btns.forEach((x, j) => { x.disabled = true; if (j === b.answer) x.classList.add('correct'); else if (j === i) x.classList.add('wrong'); });
         const ok = i === b.answer;
-        exp.innerHTML = `<div class="verdict ${ok ? 'ok' : 'bad'}">${ok ? '✓ Correct' : '✗ Not quite'}</div>${b.explain || ''}`;
+        exp.innerHTML = `<div class="verdict ${ok ? 'ok' : 'bad'}">${ok ? '✓ Correct' : '✗ Not quite'}</div>${b.explain || ''}${KS.refHtml(b)}`;
         exp.style.display = 'block';
       });
       opts.appendChild(bt);

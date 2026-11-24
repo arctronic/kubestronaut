@@ -6,7 +6,10 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
-const examId = process.argv[2] || 'kcna';
+const examId = process.argv.slice(2).find((a) => !a.startsWith('--')) || 'kcna';
+// optional: --urls=<file> with one allowed URL per line; every ref must be listed
+const urlArg = process.argv.find((a) => a.startsWith('--urls='));
+const allowedUrls = urlArg ? new Set(fs.readFileSync(urlArg.slice(7), 'utf8').split('\n').map((x) => x.trim()).filter(Boolean)) : null;
 const root = path.join(__dirname, '..', 'exams', examId);
 const BLOCKS = new Set(['text', 'html', 'bullets', 'cards', 'flip', 'compare', 'table', 'code', 'callout', 'diagram', 'flow', 'layers', 'tabs', 'cols', 'check', 'stats', 'timeline', 'reveal', 'svg', 'match']);
 const errors = [];
@@ -48,6 +51,12 @@ function checkQuestion(where, q) {
     if (!/select\s*\d|choose\s*\d|\(select|\(choose/i.test(q.q)) warn(where, 'multi-select question should say "(Select N)"');
   }
   if (!q.explain || q.explain.length < 25) err(where, 'explanation missing or too short');
+  const refs = Array.isArray(q.ref) ? q.ref : q.ref ? [q.ref] : [];
+  if (!refs.length) err(where, 'missing ref (official source URL)');
+  refs.forEach((u) => {
+    if (!/^https:\/\/[^\s]+$/.test(u)) err(where, 'ref is not an https URL: ' + u);
+    else if (allowedUrls && !allowedUrls.has(u)) err(where, 'ref not in verified URL list: ' + u);
+  });
   if (/all of the above|none of the above/i.test(opts.join(' '))) warn(where, 'avoid “all/none of the above”');
 }
 

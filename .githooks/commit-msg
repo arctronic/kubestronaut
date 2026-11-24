@@ -1,0 +1,14 @@
+#!/bin/sh
+# Enforce: one line, <= 80 chars, no co-author/attribution trailers.
+msg=$(grep -v '^#' "$1" | sed '/^[[:space:]]*$/d')
+lines=$(printf '%s\n' "$msg" | wc -l)
+len=$(printf '%s' "$msg" | wc -m)
+if printf '%s' "$msg" | grep -qi 'co-authored-by\|generated with\|claude-session'; then
+  echo "commit-msg: remove co-author / attribution lines" >&2; exit 1
+fi
+if [ "$lines" -gt 1 ]; then
+  echo "commit-msg: use a single line (no body)" >&2; exit 1
+fi
+if [ "$len" -gt 80 ]; then
+  echo "commit-msg: $len chars, max is 80" >&2; exit 1
+fi

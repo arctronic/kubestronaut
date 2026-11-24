@@ -39,10 +39,17 @@ A cover slide and a recap slide are added automatically. Do not author them.
 ### Question
 
 ```js
-{ q: 'Question text (HTML ok)', options: ['A', 'B', 'C', 'D'], answer: 1, explain: 'Why B is right and why the others are wrong.' }
+{ q: 'Question text (HTML ok)', options: ['A', 'B', 'C', 'D'], answer: 1,
+  explain: 'Why B is right and why the others are wrong.',
+  ref: 'https://kubernetes.io/docs/concepts/workloads/pods/' }
 // multi-select: answer is an array and the question says "(Select 2)"
-{ q: 'Which TWO …? (Select 2)', options: [...], answer: [0, 2], explain: '…' }
+{ q: 'Which TWO …? (Select 2)', options: [...], answer: [0, 2], explain: '…', ref: ['url1', 'url2'] }
 ```
+
+Every question (quiz, mock bank and inline `check` blocks) must have a `ref`: the official page
+(kubernetes.io, the project's own docs, the CNCF glossary or TOC) that backs the answer. It is shown as a
+“📖 Source” link under the explanation. The validator fails on a missing ref; pass `--urls=<file>` to also
+require every ref to appear in a list of verified URLs.
 
 Mock-bank questions additionally need `domain: 'fund' | 'orch' | 'delivery' | 'arch'` (KCNA) and are registered with
 `KS.registerMockBank('kcna', [ … ])`. Options are shuffled at runtime, so never write “both A and B” or “all of the above”.

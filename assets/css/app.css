@@ -409,6 +409,8 @@ a.card:hover, .card.clickable:hover { border-color: var(--accent); transform: tr
 .opt:disabled { cursor: default; }
 .explain { margin-top: 16px; padding: 14px 16px; border-radius: 12px; background: var(--panel-2); border: 1px solid var(--line); color: var(--text-2); animation: slideIn .25s; }
 .explain .verdict { font-weight: 800; margin-bottom: 4px; }
+.explain .ref { margin-top: 10px; padding-top: 9px; border-top: 1px dashed var(--line-2); font-size: .85rem; color: var(--muted); }
+.explain .ref a { font-weight: 600; }
 .explain .verdict.ok { color: var(--ok); } .explain .verdict.bad { color: var(--bad); }
 .q-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; gap: 10px; flex-wrap: wrap; }
 
