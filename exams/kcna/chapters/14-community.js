@@ -268,7 +268,7 @@ KS.registerChapter('kcna', {
           ['CKS: Certified Kubernetes Security Specialist', 'Hands-on, performance-based', 'Securing clusters and workloads; requires an active CKA'],
         ] },
         { type: 'callout', kind: 'exam', title: 'Kubestronaut', html: 'A <b>Kubestronaut</b> holds all five Kubernetes certifications at the same time: <b>KCNA, KCSA, CKAD, CKA and CKS</b>. The <b>Golden Kubestronaut</b> extends this to every CNCF certification plus the LFCS.' },
-        { type: 'check', q: 'Which certification must be held (and active) before you can take the CKS exam?', options: ['KCNA', 'CKAD', 'CKA', 'KCSA'], answer: 2, explain: 'The <b>CKS</b> requires an active <b>CKA</b>, because it builds on cluster administration skills. KCNA, KCSA and CKAD are not prerequisites for CKS.', ref: 'https://www.cncf.io/training/kubestronaut/' },
+        { type: 'check', q: 'Which certification must be held (and active) before you can take the CKS exam?', options: ['KCNA', 'CKAD', 'CKA', 'KCSA'], answer: 2, explain: 'The <b>CKS</b> requires an active <b>CKA</b>, because it builds on cluster administration skills. KCNA, KCSA and CKAD are not prerequisites for CKS.', ref: 'https://training.linuxfoundation.org/certification/certified-kubernetes-security-specialist/' },
       ],
       tip: 'Associates (KCNA, KCSA) are multiple choice; the “Certified … ” exams (CKA, CKAD, CKS) are hands-on in a live terminal.',
     },
