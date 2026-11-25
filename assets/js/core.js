@@ -105,7 +105,45 @@
     recordAnswer(examId, qid, correct) {
       const s = (this.exam(examId).qstats[qid] = this.exam(examId).qstats[qid] || { seen: 0, correct: 0 });
       s.seen++; if (correct) s.correct++; s.last = correct ? 1 : 0;
+      this.touch({ answered: 1, correct: correct ? 1 : 0 });
     },
+
+    /* ---- learning activity (streaks, weekly goal, study time, feed) ---- */
+    today() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); },
+    touch(delta) {
+      state.activity = state.activity || {};
+      const a = (state.activity[this.today()] = state.activity[this.today()] || { min: 0, answered: 0, correct: 0, slides: 0 });
+      Object.keys(delta || {}).forEach((k) => (a[k] = (a[k] || 0) + delta[k]));
+    },
+    event(examId, text, icon) {
+      state.events = state.events || [];
+      state.events.unshift({ t: Date.now(), exam: examId, text, icon: icon || '•' });
+      state.events = state.events.slice(0, 40);
+      save();
+    },
+    streak() {
+      const act = state.activity || {};
+      let n = 0; const d = new Date();
+      if (!act[this.today()]) d.setDate(d.getDate() - 1); // today not started yet: keep yesterday's streak alive
+      for (;;) {
+        const k = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        if (!act[k]) break; n++; d.setDate(d.getDate() - 1);
+      }
+      return n;
+    },
+    week() { // Monday-first list of the current week's days with activity
+      const act = state.activity || {}; const now = new Date(); const day = (now.getDay() + 6) % 7;
+      const start = new Date(now); start.setDate(now.getDate() - day);
+      return Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(start); d.setDate(start.getDate() + i);
+        const k = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        return { key: k, label: 'MTWTFSS'[i], active: !!act[k], today: i === day, future: i > day, data: act[k] };
+      });
+    },
+    get goal() { return state.goal || 4; },
+    set goal(v) { state.goal = v; save(); },
+    setLast(info) { state.lastVisit = Object.assign({ t: Date.now() }, info); save(); },
+    notes(examId) { const p = this.exam(examId); p.notes = p.notes || {}; return p.notes; },
     exportJSON() { return JSON.stringify(state, null, 2); },
     importJSON(txt) { const s = JSON.parse(txt); if (!s || typeof s !== 'object') throw new Error('bad file'); state = s; state.progress = state.progress || {}; save(); },
     reset() { state = { progress: {}, theme: state.theme }; save(); },
@@ -118,12 +156,19 @@
     else document.documentElement.removeAttribute('data-theme');
   };
   KS.toggleTheme = function () {
-    const cur = document.documentElement.getAttribute('data-theme') ||
-      (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    const cur = document.documentElement.getAttribute('data-theme') || 'light';
     state.theme = cur === 'light' ? 'dark' : 'light';
     save(); KS.applyTheme();
   };
   KS.applyTheme();
+
+  /* ---------------- study timer: +1 min per visible minute on a learning page ---------------- */
+  KS.studying = false;
+  let lastInput = Date.now();
+  ['mousemove', 'keydown', 'scroll', 'touchstart', 'click'].forEach((ev) => window.addEventListener(ev, () => (lastInput = Date.now()), { passive: true }));
+  setInterval(() => {
+    if (KS.studying && document.visibilityState === 'visible' && Date.now() - lastInput < 120000) { KS.store.touch({ min: 1 }); KS.store.save(); }
+  }, 60000);
 
   /* ---------------- helpers ---------------- */
   KS.h = function (tag, attrs, ...kids) {

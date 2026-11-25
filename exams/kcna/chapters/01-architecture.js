@@ -65,9 +65,9 @@ KS.registerChapter('kcna', {
             { from: 'ccm', to: 'api', dashed: true, color: 'gray' },
             { from: 'k1', to: 'api', dashed: true, color: 'green' },
             { from: 'k2', to: 'api', dashed: true, color: 'green', bend: 40 },
-            { from: 'k1', to: 'r1', label: 'CRI', color: 'pink' },
+            { from: 'k1', to: 'r1', color: 'pink' },
             { from: 'r1', to: 'pb', color: 'pink' },
-            { from: 'k2', to: 'r2', label: 'CRI', color: 'pink' },
+            { from: 'k2', to: 'r2', color: 'pink' },
             { from: 'r2', to: 'pc', color: 'pink' },
           ],
           steps: [

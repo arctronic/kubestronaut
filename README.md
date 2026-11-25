@@ -1,4 +1,4 @@
-# ☸️ Kubestronaut Study Hub
+# ☸️ Kubestronaut Academy
 
 A personal study platform for the five Kubestronaut certifications: **KCNA → KCSA → CKAD → CKA → CKS**.
 KCNA is fully built out. The other exams are registered and ready to be filled with content.
@@ -14,7 +14,14 @@ KCNA is fully built out. The other exams are registered and ready to be filled w
 - **Exam intel**: format, blueprint, what real candidates report, traps, exam-day checklist (with sources)
 - **Library** for your own saved Claude artifacts
 
-Progress is stored in your browser (localStorage). Use *Backup / restore* in the footer to move it between devices.
+### Learner experience (course-platform style)
+
+- **Dashboard**: continue-learning card, the 5-course Kubestronaut path, weekly goal with day tracker, streak, study time, accuracy, per-domain readiness and an activity feed
+- **Course page**: modules → lessons → items (slides, practice quiz, optional flashcards) with completion status, plus Grades, Notes, Exam guide and Resources tabs
+- **Lesson player**: collapsible outline sidebar, next/previous item, notes drawer that autosaves per lesson, resume exactly where you left off
+
+Everything (progress, grades, attempts, notes, streaks, weekly goal, study time) is stored in your browser's
+local storage. Nothing leaves the device. Use *Progress & backup* (gear icon) to export or restore it.
 
 ## Run it
 

@@ -73,7 +73,7 @@ server.listen(0, async () => {
       if (overlap) fail(`mock ${i + 1} and ${j + 1} share ${overlap} questions`);
     }
 
-    for (const r of ['', `exam/${examId}`, `exam/${examId}/intel`, `exam/${examId}/library`, `exam/${examId}/cheatsheet`, `exam/${examId}/flash/all`, `exam/${examId}/drill`, 'data']) {
+    for (const r of ['', `exam/${examId}`, `exam/${examId}/grades`, `exam/${examId}/notes`, `exam/${examId}/intel`, `exam/${examId}/library`, `exam/${examId}/quiz/architecture`, `exam/${examId}/flash/architecture`, `exam/${examId}/cheatsheet`, `exam/${examId}/flash/all`, `exam/${examId}/drill`, 'data']) {
       await page.goto(`${base}#/${r}`);
       await page.waitForSelector('.topbar');
     }
