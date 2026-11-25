@@ -8,10 +8,10 @@ exams/
   <exam>/exam.js              # blueprint: domains + weights, chapter list, mock config, intel page, library
   <exam>/chapters/NN-*.js     # one chapter = slides + summary + glossary + quiz
   <exam>/mock-bank-*.js       # extra questions used by the fixed mock exams
-  <exam>/library/*.html       # your own saved artifacts / cheat sheets (opened in-app)
 ```
 
-Validate after every change:
+The Next.js app reads these files at build time (`lib/content.js`) and pre-renders a page per lesson,
+quiz, flashcard deck and mock exam. Validate after every change:
 
 ```bash
 node tools/validate.js kcna
@@ -24,7 +24,7 @@ KS.registerChapter('kcna', {
   id: 'scheduling',              // must match the id in exam.js `chapters`
   title: 'Scheduling',
   subtitle: 'How Pods land on nodes',   // HTML allowed
-  icon: '🧭',
+  icon: 'compass',               // Lucide icon name (https://lucide.dev/icons), never an emoji
   minutes: 25,
   objectives: ['…', '…'],        // shown on the auto-generated cover slide
   slides: [ { kicker, title, blocks: [ …blocks ], tip } ],
@@ -77,7 +77,9 @@ Mock-bank questions additionally need `domain: 'fund' | 'orch' | 'delivery' | 'a
 | `match` | `pairs[[left,right]]`, `title?` | click-to-match exercise |
 | `svg` | `svg` (raw markup), `caption?` | custom drawing |
 
-Colors are names: `blue, teal, green, amber, red, purple, pink, gray`.
+Colors are names: `blue, teal, green, amber, red, purple, pink, gray`. Every `icon` field is a
+[Lucide](https://lucide.dev/icons) icon name such as `database` or `shield`. If you use a new one, add it to
+`components/Icon.jsx`. Emojis are not used anywhere.
 
 ### Diagram
 
@@ -96,14 +98,14 @@ Coordinates are in the viewBox (default 900×420). Keep nodes inside the canvas 
 
 1. Create `exams/<id>/exam.js` (copy KCNA's and change domains and weights from the CNCF curriculum).
 2. Add chapter files and mock banks, then run the validator.
-3. Set `available: true` for the exam in `exams/registry.js`.
+3. Set `available: true` for the exam in `exams/registry.js`. Its pages, sitemap entries and metadata are generated automatically on the next build.
 
 ## Saving a Claude artifact into the library
 
-Save the artifact's HTML into `exams/<id>/library/<name>.html` and add an entry to `library` in `exam.js`:
+Save the artifact's HTML into `public/<id>/library/<name>.html` and add an entry to `library` in `exam.js`:
 
 ```js
-{ group: 'My artifacts', icon: '🧩', kind: 'page', title: 'Service types explained', url: 'library/service-types.html' }
+{ group: 'My artifacts', icon: 'puzzle', kind: 'page', title: 'Service types explained', url: 'library/service-types.html' }
 ```
 
 External links (for example a published claude.ai artifact URL) just omit `kind`.

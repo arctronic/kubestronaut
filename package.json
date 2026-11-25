@@ -1,10 +1,21 @@
 {
   "name": "kubestronaut",
   "private": true,
-  "description": "Study hub for the five Kubestronaut certifications",
+  "description": "Kubestronaut Academy: study platform for KCNA, KCSA, CKAD, CKA and CKS",
   "scripts": {
-    "start": "python3 -m http.server 8000",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "npx --yes serve@14.2.4 out -l 3000",
     "validate": "node tools/validate.js kcna",
     "test": "node tools/validate.js kcna && node tests/e2e.js"
+  },
+  "dependencies": {
+    "lucide-react": "0.460.0",
+    "next": "15.5.29",
+    "react": "19.1.10",
+    "react-dom": "19.1.10"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

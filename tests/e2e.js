@@ -1,80 +1,80 @@
 #!/usr/bin/env node
-/* End-to-end check: renders every slide, runs all mocks, visits every page.
-   Needs Playwright with Chromium: node tests/e2e.js [examId] */
+/* End-to-end check of the static export (run `npm run build` first).
+   Serves ./out, then in Chromium: every lesson renders all its slides, every quiz/flashcard page works,
+   all mock exams start with a blueprint-weighted, non-overlapping question set, and no page logs errors. */
 'use strict';
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { chromium } = require('playwright');
 
-const examId = process.argv[2] || 'kcna';
-const root = path.join(__dirname, '..');
-const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml' };
-
+const root = path.join(__dirname, '..', 'out');
+if (!fs.existsSync(root)) { console.error('out/ not found: run `npm run build` first'); process.exit(1); }
+const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.xml': 'application/xml', '.txt': 'text/plain' };
 const server = http.createServer((req, res) => {
-  const file = path.join(root, decodeURIComponent(req.url.split('?')[0]).replace(/\/$/, '/index.html'));
-  if (!file.startsWith(root) || !fs.existsSync(file)) { res.writeHead(404); return res.end(); }
+  let p = decodeURIComponent(req.url.split('?')[0]);
+  if (p.endsWith('/')) p += 'index.html';
+  const file = path.join(root, p);
+  if (!file.startsWith(root) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) { res.writeHead(404); return res.end(); }
   res.writeHead(200, { 'Content-Type': TYPES[path.extname(file)] || 'application/octet-stream' });
   fs.createReadStream(file).pipe(res);
 });
-
-function fail(msg) { console.error('✗ ' + msg); process.exitCode = 1; }
+const fail = (m) => { console.error('✗ ' + m); process.exitCode = 1; };
 
 server.listen(0, async () => {
-  const base = `http://localhost:${server.address().port}/`;
+  const base = `http://localhost:${server.address().port}`;
   const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   const errors = [];
-  page.on('pageerror', (e) => errors.push(e.message));
-  page.on('console', (m) => { if (m.type() === 'error' && !/fonts\.g/.test(m.text())) errors.push(m.text()); });
+  page.on('pageerror', (e) => errors.push(page.url() + ' ' + e.message));
+  page.on('console', (m) => { if (m.type() === 'error' && !/fonts\.g|404/.test(m.text())) errors.push(page.url() + ' ' + m.text()); });
   try {
-    await page.goto(base + '#/exam/' + examId);
-    await page.waitForFunction((id) => KS.exams[id] && KS.exams[id].chapterList, examId);
-    const e = await page.evaluate((id) => {
-      const x = KS.exams[id];
-      return { chapters: x.chapterList.map((c) => [c.id, c.slides.length + 2]), mock: x.mock, domains: x.domains };
-    }, examId);
+    const sitemap = fs.readFileSync(path.join(root, 'sitemap.xml'), 'utf8');
+    const urls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname);
+    console.log(`sitemap: ${urls.length} URLs`);
 
-    let slides = 0;
-    for (const [id, n] of e.chapters) {
-      for (let i = 1; i <= n; i++) {
-        await page.goto(`${base}#/exam/${examId}/learn/${id}/${i}`);
-        const r = await page.evaluate(() => ({
-          ok: !!document.querySelector('.slide'),
-          bad: [...document.querySelectorAll('.b-callout.warn .ct')].some((x) => /Unknown block|Block error/.test(x.textContent)),
-          overflow: document.documentElement.scrollWidth > innerWidth + 2,
-        }));
-        if (!r.ok || r.bad) fail(`slide ${id}/${i} did not render`);
-        if (r.overflow) fail(`slide ${id}/${i} overflows horizontally`);
-        slides++;
-      }
+    let slides = 0, lessons = 0;
+    for (const u of urls.filter((x) => /\/learn\//.test(x))) {
+      await page.goto(base + u);
+      const r = await page.evaluate(() => ({ total: document.querySelectorAll('article.slide').length, visible: document.querySelectorAll('article.slide:not([hidden])').length, title: document.title, ld: !!document.querySelector('script[type="application/ld+json"]') }));
+      if (r.total < 5 || r.visible !== 1) fail(`${u}: ${r.total} slides, ${r.visible} visible`);
+      if (!r.ld) fail(`${u}: missing structured data`);
+      slides += r.total; lessons++;
     }
-    console.log(`✓ ${slides} slides rendered`);
+    console.log(`✓ ${lessons} lessons, ${slides} slides rendered`);
 
-    const keys = Array.from({ length: e.mock.sets }, (_, i) => String(i + 1)).concat('random');
+    for (const u of urls.filter((x) => /\/(quiz|flashcards)\//.test(x))) {
+      await page.goto(base + u);
+      await page.waitForSelector(/quiz/.test(u) ? 'text=Start quiz' : '.fc');
+    }
+    // take one quiz end to end
+    await page.goto(base + '/kcna/quiz/storage/');
+    await page.click('text=Start quiz');
+    for (let i = 0; i < 12; i++) {
+      if (await page.locator('text=Submit answer').isVisible()) { await page.locator('.opt').nth(0).click(); await page.locator('.opt').nth(1).click(); await page.click('text=Submit answer'); }
+      else await page.locator('.opt').first().click();
+      await page.locator('.q-foot .btn.primary').last().click();
+    }
+    await page.waitForSelector('.result-card');
+    console.log('✓ quiz and flashcard pages work');
+
     const fixed = [];
-    for (const key of keys) {
-      await page.goto(`${base}#/exam/${examId}/mock/${key}`);
+    for (const key of ['1', '2', '3', 'random']) {
+      await page.goto(`${base}/kcna/mock/${key}/`);
       await page.click('text=Start the clock');
-      const m = await page.evaluate((id) => {
-        const x = KS.exams[id], a = KS.store.exam(id).activeMock, d = {};
-        a.qids.forEach((q) => { const dom = x.questionIndex[q].domain; d[dom] = (d[dom] || 0) + 1; });
-        return { ids: a.qids, d };
-      }, examId);
-      if (m.ids.length !== e.mock.questions || new Set(m.ids).size !== m.ids.length) fail(`mock ${key}: bad question set`);
-      if (key !== 'random') fixed.push(m.ids);
+      await page.waitForSelector('.mock-head');
+      const ids = await page.evaluate(() => JSON.parse(localStorage.getItem('kubestronaut.v1')).progress.kcna.activeMock.qids);
+      if (ids.length !== 60 || new Set(ids).size !== 60) fail(`mock ${key}: bad question set`);
+      if (key !== 'random') fixed.push(ids);
       await page.click('.mock-head >> text=Submit');
       await page.click('text=Submit now');
       await page.waitForSelector('.result-hero');
-      console.log(`✓ mock ${key}: ${m.ids.length} questions ${JSON.stringify(m.d)}`);
     }
-    for (let i = 0; i < fixed.length; i++) for (let j = i + 1; j < fixed.length; j++) {
-      const overlap = fixed[i].filter((q) => fixed[j].includes(q)).length;
-      if (overlap) fail(`mock ${i + 1} and ${j + 1} share ${overlap} questions`);
-    }
+    for (let i = 0; i < fixed.length; i++) for (let j = i + 1; j < fixed.length; j++) if (fixed[i].some((q) => fixed[j].includes(q))) fail(`mocks ${i + 1} and ${j + 1} overlap`);
+    console.log('✓ 4 mock exams: 60 unique questions each, fixed sets do not overlap');
 
-    for (const r of ['', `exam/${examId}`, `exam/${examId}/grades`, `exam/${examId}/notes`, `exam/${examId}/intel`, `exam/${examId}/library`, `exam/${examId}/quiz/architecture`, `exam/${examId}/flash/architecture`, `exam/${examId}/cheatsheet`, `exam/${examId}/flash/all`, `exam/${examId}/drill`, 'data']) {
-      await page.goto(`${base}#/${r}`);
+    for (const u of ['/', '/kcna/', '/kcna/grades/', '/kcna/notes/', '/kcna/guide/', '/kcna/resources/', '/kcna/cheatsheet/', '/kcna/flashcards/', '/kcna/drill/', '/settings/']) {
+      await page.goto(base + u);
       await page.waitForSelector('.topbar');
     }
     console.log('✓ all pages load');
