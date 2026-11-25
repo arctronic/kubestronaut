@@ -38,6 +38,11 @@ if (wsum !== 100) err('exam.js', 'domain weights sum to ' + wsum);
 exam.chapters.forEach((c) => { const f = path.join(root, 'chapters', c.file); if (!fs.existsSync(f)) err('exam.js', 'missing chapter file ' + c.file); else run(f); });
 (exam.extraFiles || []).forEach((f) => { const p = path.join(root, f); if (!fs.existsSync(p)) err('exam.js', 'missing extra file ' + f); else run(p); });
 
+// icon names available in components/Icon.jsx (Lucide)
+const ICONS = new Set([...fs.readFileSync(path.join(__dirname, '..', 'components', 'Icon.jsx'), 'utf8').matchAll(/^\s*'([a-z0-9-]+)':/gm)].map((m) => m[1]));
+const EMOJI = /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{2300}-\u{23FF}]/u;
+function checkIcon(where, name) { if (name && !ICONS.has(name)) err(where, `unknown icon "${name}" (use a name from components/Icon.jsx)`); }
+
 function checkQuestion(where, q) {
   if (!q || typeof q.q !== 'string' || !q.q.trim()) return err(where, 'missing question text');
   if (!Array.isArray(q.options) || q.options.length < 3 || q.options.length > 6) err(where, 'needs 3–6 options');
@@ -68,17 +73,34 @@ function checkBlocks(where, blocks) {
     if (b.type === 'tabs') (b.tabs || []).forEach((t) => checkBlocks(w, t.blocks));
     if (b.type === 'check') checkQuestion(w, b);
     if (b.type === 'match' && (!b.pairs || b.pairs.length < 3)) err(w, 'match needs ≥3 pairs');
+    if (b.type === 'cards' || b.type === 'flow') (b.items || []).forEach((it, k) => checkIcon(`${w} item ${k + 1}`, it.icon));
+    if (EMOJI.test(JSON.stringify(b))) err(w, 'emoji found: use a Lucide icon name or plain text');
     if (b.type === 'code') {
       const n = String(b.code || '').replace(/^\n/, '').replace(/\s+$/, '').split('\n').length;
       Object.keys(b.notes || {}).forEach((k) => { if (+k < 1 || +k > n) err(w, `note line ${k} outside 1..${n}`); });
     }
     if (b.type === 'diagram') {
       const ids = new Set();
+      const W = b.width || 900, H = b.height || 420;
+      const rects = [];
       (b.nodes || []).forEach((n) => {
         if (ids.has(n.id)) err(w, 'duplicate node id ' + n.id); ids.add(n.id);
-        const W = b.width || 900, H = b.height || 420, nw = n.w || 150, nh = n.h || 56;
-        if (n.x < 0 || n.y < 0 || n.x + nw > W || n.y + nh > H) warn(w, `node ${n.id} outside canvas`);
+        const nw = n.w || 150, nh = n.h || 56;
+        if (n.x < 0 || n.y < 0 || n.x + nw > W || n.y + nh > H) err(w, `node ${n.id} outside the ${W}x${H} canvas`);
+        checkIcon(w + ' node ' + n.id, n.icon);
+        // label must fit: ~0.56em per char at the node font size, plus icon and padding
+        const fs_ = n.fs || 14, longest = Math.max(...String(n.label || '').split('\n').map((l) => l.length));
+        const need = longest * fs_ * 0.56 + (n.icon ? 22 : 0) + 16;
+        if (need > nw + 8) err(w, `node ${n.id} label too wide (${Math.round(need)}px needed, w=${nw}); shorten, split with \\n, or widen`);
+        if (n.sub && n.sub.length * 11.5 * 0.5 + 12 > nw) warn(w, `node ${n.id} sub-label may overflow`);
+        const lines = String(n.label || '').split('\n').length + (n.sub ? 1 : 0);
+        if (lines * 16 + 8 > nh) err(w, `node ${n.id} too short for ${lines} text lines (h=${nh})`);
+        rects.forEach((r) => { if (n.x < r.x + r.w + 8 && n.x + nw + 8 > r.x && n.y < r.y + r.h + 8 && n.y + nh + 8 > r.y) err(w, `nodes ${r.id} and ${n.id} overlap or are closer than 8px`); });
+        rects.push({ id: n.id, x: n.x, y: n.y, w: nw, h: nh });
       });
+      (b.groups || []).forEach((g, gi) => { if (g.x < 0 || g.y < 0 || g.x + g.w > W || g.y + g.h > H) err(w, `group ${gi + 1} (${g.label}) outside canvas`); });
+      (b.edges || []).forEach((e) => { if (e.label && e.label.length > 16) warn(w, `edge ${e.from}>${e.to} label "${e.label}" is long (keep it under 16 chars)`); });
+      if ((b.steps || []).some((st) => !(st.on || []).length)) err(w, 'every step needs a non-empty "on" list');
       const eids = new Set();
       (b.edges || []).forEach((e) => { if (!ids.has(e.from) || !ids.has(e.to)) err(w, `edge ${e.from}>${e.to} references unknown node`); eids.add(e.from + '>' + e.to); });
       (b.steps || []).forEach((s, si) => (s.on || []).forEach((x) => { if (!ids.has(x) && !eids.has(x)) err(w, `step ${si + 1} references unknown id ${x}`); }));
@@ -92,6 +114,7 @@ const perDomain = {};
 exam.chapters.forEach((c) => {
   const ch = store.chapters[c.id];
   if (!ch) return err(c.id, 'chapter not registered (id mismatch?)');
+  checkIcon(c.id, ch.icon);
   ['title', 'subtitle', 'icon', 'slides', 'summary', 'glossary', 'quiz', 'objectives'].forEach((k) => { if (!ch[k] || (Array.isArray(ch[k]) && !ch[k].length)) err(c.id, 'missing ' + k); });
   (ch.slides || []).forEach((s, i) => { if (!s.title) warn(`${c.id} slide ${i + 1}`, 'no title'); checkBlocks(`${c.id} slide ${i + 1}`, s.blocks); });
   (ch.quiz || []).forEach((q, i) => {

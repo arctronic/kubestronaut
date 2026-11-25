@@ -210,7 +210,7 @@ spec:
           { icon: 'rocket', color: 'blue', title: 'Knative Serving', text: 'Runs stateless containers with request-driven autoscaling, <b>scale to zero</b>, immutable <b>Revisions</b> and traffic splitting between them.' },
           { icon: 'mail', color: 'purple', title: 'Knative Eventing', text: 'Event sources, <b>Brokers</b> and <b>Triggers</b> route events to services. Events are expressed as CloudEvents.' },
           { icon: 'mail', color: 'green', title: 'CloudEvents', text: 'CNCF graduated <b>specification</b> for describing event data in a common way across services, platforms and clouds.' },
-          { icon: 'λ', color: 'amber', title: 'OpenFaaS & others', text: 'OpenFaaS is a popular open-source FaaS framework for Kubernetes (independent, not a CNCF-hosted project). Cloud FaaS: AWS Lambda, Azure Functions, Google Cloud Run functions.' },
+          { icon: 'zap', color: 'amber', title: 'OpenFaaS & others', text: 'OpenFaaS is a popular open-source FaaS framework for Kubernetes (independent, not a CNCF-hosted project). Cloud FaaS: AWS Lambda, Azure Functions, Google Cloud Run functions.' },
         ] },
         { type: 'code', lang: 'bash', title: 'a CloudEvent in HTTP binary mode', code: `
 POST /orders HTTP/1.1
