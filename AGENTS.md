@@ -2,7 +2,7 @@
 
 Study platform for the Kubestronaut certifications (KCNA first). Next.js App Router with **static export**:
 every lesson, quiz and mock exam is pre-rendered HTML. Learner progress lives only in the browser
-(localStorage). Live at https://k8s.tronics.dev, deployed by Easypanel from the `Dockerfile` on push.
+(localStorage). Live at https://k8s.tronics.dev, deployed by Easypanel from the `Dockerfile` on every push to `main`.
 
 ## Commands
 
@@ -47,6 +47,17 @@ Content files are plain scripts: `KS.registerChapter('kcna', { ... })`. They are
 7. **Commits:** a single line of at most 80 characters, imperative mood, **no `Co-Authored-By` or any
    other trailer**, no tool attribution. Enforced by `.githooks/commit-msg`
    (`git config core.hooksPath .githooks`).
+
+## Git
+- `main` is production: every push to `main` deploys https://k8s.tronics.dev (Easypanel, `Dockerfile`).
+- Work on a short-lived branch named `feat/<topic>`, `fix/<topic>`, `content/<topic>` or `docs/<topic>`,
+  one topic per branch, then merge into `main` once `npm run validate`, `npm run build` and `npm test` pass.
+- Never force-push, rebase or rewrite history on `main`, and never delete it. Fix mistakes with a new commit
+  (`git revert`). The `pre-push` hook blocks non fast-forward pushes to `main` and runs the validator.
+- Keep commits small and focused: one logical change per commit, content and code changes separate.
+- Never commit secrets (`.env`, tokens, keys) or generated files (`node_modules/`, `.next/`, `out/`).
+- Pull before you start (`git pull --ff-only`) so `main` stays linear.
+- Enable the hooks once per clone: `git config core.hooksPath .githooks`.
 
 ## Design language
 

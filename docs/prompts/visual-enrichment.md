@@ -180,9 +180,15 @@ each new diagram.
 
 ## 9. Finish
 
-1. Commit with a single-line message, at most 80 characters, **no co-author or other trailers**, e.g.
+1. Work on a branch: `git switch -c content/visuals-<CHAPTER_ID>` (from an up-to-date `main`).
+2. Commit with a single-line message, at most 80 characters, **no co-author or other trailers**, e.g.
    `Add scheduling diagrams for taints, affinity and spread`.
-2. Report: slides changed (number + title), what each new visual shows, the audit numbers before and after,
+3. When all checks pass, merge into `main` without rewriting history and push. **Pushing `main` deploys the
+   live site.** Never force-push `main`.
+   ```bash
+   git switch main && git pull --ff-only && git merge --no-ff content/visuals-<CHAPTER_ID> && git push origin main
+   ```
+4. Report: slides changed (number + title), what each new visual shows, the audit numbers before and after,
    and the four command results.
 
 ## Chapters

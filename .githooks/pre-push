@@ -1,0 +1,21 @@
+#!/bin/sh
+# Guards for pushes. Enable once per clone: git config core.hooksPath .githooks
+# - blocks force-pushes (non fast-forward) and deletion of main/master
+# - runs the content validator before anything reaches main (main deploys to production)
+z40=0000000000000000000000000000000000000000
+while read local_ref local_sha remote_ref remote_sha; do
+  case "$remote_ref" in
+    refs/heads/main|refs/heads/master)
+      if [ "$local_sha" = "$z40" ]; then
+        echo "pre-push: refusing to delete ${remote_ref#refs/heads/}" >&2; exit 1
+      fi
+      if [ "$remote_sha" != "$z40" ] && ! git merge-base --is-ancestor "$remote_sha" "$local_sha" 2>/dev/null; then
+        echo "pre-push: refusing to rewrite ${remote_ref#refs/heads/} (non fast-forward). Merge instead." >&2; exit 1
+      fi
+      if ! node tools/validate.js kcna >/dev/null 2>&1; then
+        echo "pre-push: content validation failed. Run: npm run validate" >&2; exit 1
+      fi
+      ;;
+  esac
+done
+exit 0

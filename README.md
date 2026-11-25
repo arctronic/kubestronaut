@@ -57,7 +57,8 @@ docker run -p 8080:80 kubestronaut
 ```
 
 The image validates content, builds the static site and serves it with nginx on port 80. On Easypanel the
-service builds from this repo's `Dockerfile` and redeploys on push. Set `NEXT_PUBLIC_SITE_URL` (build arg)
+service builds from this repo's `Dockerfile` and redeploys on every push to `main`. See the Git rules in
+[CLAUDE.md](CLAUDE.md): work on a branch, merge to `main` when checks pass, never rewrite `main`. Set `NEXT_PUBLIC_SITE_URL` (build arg)
 if the site moves to another domain; it is used for canonical URLs and the sitemap.
 
 ## Layout
