@@ -2,7 +2,7 @@ KS.registerChapter('kcna', {
   id: 'networking',
   title: 'Networking',
   subtitle: 'Pod IPs, CNI, Services, DNS, Ingress, Gateway API, NetworkPolicy and service meshes',
-  icon: '🌐',
+  icon: 'globe',
   minutes: 35,
   objectives: [
     'State the three rules of the Kubernetes network model and which component (CNI) implements them',
@@ -19,10 +19,10 @@ KS.registerChapter('kcna', {
       blocks: [
         { type: 'text', html: 'Kubernetes does not ship a network implementation. It defines <b>rules</b> that any network plugin must satisfy, so applications can treat the cluster as one flat network, much like VMs on a LAN.' },
         { type: 'cards', items: [
-          { icon: '🏷️', color: 'blue', title: 'Every Pod gets its own IP', text: 'An IP per Pod, not per container. No port juggling between apps on the same node.' },
-          { icon: '↔️', color: 'green', title: 'Pods talk without NAT', text: 'Any Pod can reach any other Pod on any node using its real IP. The IP a Pod sees for itself is the IP others see.' },
-          { icon: '🏠', color: 'purple', title: 'Containers share localhost', text: 'Containers in one Pod share a network namespace: same IP, same ports, they reach each other on <code>localhost</code>.' },
-          { icon: '🖥️', color: 'teal', title: 'Node agents reach Pods', text: 'Agents on a node (kubelet, system daemons) can talk to all Pods on that node, e.g. for probes.' },
+          { icon: 'tag', color: 'blue', title: 'Every Pod gets its own IP', text: 'An IP per Pod, not per container. No port juggling between apps on the same node.' },
+          { icon: 'arrow-left-right', color: 'green', title: 'Pods talk without NAT', text: 'Any Pod can reach any other Pod on any node using its real IP. The IP a Pod sees for itself is the IP others see.' },
+          { icon: 'house', color: 'purple', title: 'Containers share localhost', text: 'Containers in one Pod share a network namespace: same IP, same ports, they reach each other on <code>localhost</code>.' },
+          { icon: 'monitor', color: 'teal', title: 'Node agents reach Pods', text: 'Agents on a node (kubelet, system daemons) can talk to all Pods on that node, e.g. for probes.' },
         ] },
         { type: 'compare', headers: ['Problem', 'Solved by'], rows: [
           ['Container-to-container in a Pod', 'Shared network namespace (localhost)'],
@@ -39,16 +39,16 @@ KS.registerChapter('kcna', {
       title: 'CNI: the Container Network Interface',
       blocks: [
         { type: 'flow', items: [
-          { icon: '📥', label: 'Pod scheduled', sub: 'kubelet picks it up', info: 'The kubelet asks the container runtime (over CRI) to create the Pod sandbox.' },
-          { icon: '🧱', label: 'Sandbox created', sub: 'new network namespace', info: 'The runtime creates the Pod’s network namespace (the pause/sandbox container holds it).' },
-          { icon: '🔌', label: 'CNI ADD', sub: 'runtime calls the plugin', info: 'The runtime executes the CNI plugin configured on the node (config in <code>/etc/cni/net.d</code>, binaries in <code>/opt/cni/bin</code>).' },
-          { icon: '🏷️', label: 'IP assigned', sub: 'IPAM + routes', info: 'The plugin creates the interface (e.g. a veth pair), allocates an IP from the node’s Pod CIDR via IPAM and sets up routes or overlays.' },
-          { icon: '🟢', label: 'Pod reachable', sub: 'from every node', info: 'On deletion the runtime calls CNI DEL to release the IP.' },
+          { icon: 'inbox', label: 'Pod scheduled', sub: 'kubelet picks it up', info: 'The kubelet asks the container runtime (over CRI) to create the Pod sandbox.' },
+          { icon: 'blocks', label: 'Sandbox created', sub: 'new network namespace', info: 'The runtime creates the Pod’s network namespace (the pause/sandbox container holds it).' },
+          { icon: 'plug', label: 'CNI ADD', sub: 'runtime calls the plugin', info: 'The runtime executes the CNI plugin configured on the node (config in <code>/etc/cni/net.d</code>, binaries in <code>/opt/cni/bin</code>).' },
+          { icon: 'tag', label: 'IP assigned', sub: 'IPAM + routes', info: 'The plugin creates the interface (e.g. a veth pair), allocates an IP from the node’s Pod CIDR via IPAM and sets up routes or overlays.' },
+          { icon: 'circle-dot', label: 'Pod reachable', sub: 'from every node', info: 'On deletion the runtime calls CNI DEL to release the IP.' },
         ], caption: 'What happens when a Pod gets its network.' },
         { type: 'cards', cols: 3, items: [
-          { icon: '🐯', color: 'amber', title: 'Calico', text: 'L3 routing (BGP) or overlay, with rich <b>NetworkPolicy</b> support. Very common on-prem and in managed clouds.' },
-          { icon: '🐝', color: 'purple', title: 'Cilium', text: '<b>eBPF</b>-based networking, policy (including L7) and observability (Hubble). Can replace kube-proxy. CNCF graduated.' },
-          { icon: '🧶', color: 'gray', title: 'Flannel', text: 'Simple overlay (VXLAN). Easy to set up but does <b>not enforce NetworkPolicy</b> by itself.' },
+          { icon: 'cat', color: 'amber', title: 'Calico', text: 'L3 routing (BGP) or overlay, with rich <b>NetworkPolicy</b> support. Very common on-prem and in managed clouds.' },
+          { icon: 'activity', color: 'purple', title: 'Cilium', text: '<b>eBPF</b>-based networking, policy (including L7) and observability (Hubble). Can replace kube-proxy. CNCF graduated.' },
+          { icon: 'waypoints', color: 'gray', title: 'Flannel', text: 'Simple overlay (VXLAN). Easy to set up but does <b>not enforce NetworkPolicy</b> by itself.' },
         ] },
         { type: 'callout', kind: 'trap', title: 'CNI vs CRI vs CSI', html: '<b>CNI</b> = networking, <b>CRI</b> = container runtime, <b>CSI</b> = storage. Without a CNI plugin, nodes stay <code>NotReady</code> and Pods stay <code>Pending</code> or <code>ContainerCreating</code>.' },
       ],
@@ -63,10 +63,10 @@ KS.registerChapter('kcna', {
         { type: 'cols', ratio: '1fr 1fr', cols: [
           [
             { type: 'flow', items: [
-              { icon: '🏷️', label: 'Selector', sub: 'app=web', info: 'The Service spec has <code>selector: {app: web}</code>. It does not list Pods by name.' },
-              { icon: '🔁', label: 'EndpointSlice controller', sub: 'watches Pods', info: 'A controller in kube-controller-manager finds Pods matching the selector and tracks whether each one is <b>Ready</b>.' },
-              { icon: '📋', label: 'EndpointSlices', sub: 'IP:port list', info: 'It writes EndpointSlice objects (labelled <code>kubernetes.io/service-name</code>) listing Pod IPs, ports and readiness. Large Services are split across several slices.' },
-              { icon: '🔀', label: 'kube-proxy', sub: 'programs rules', info: 'kube-proxy on every node watches Services and EndpointSlices and programs forwarding rules.' },
+              { icon: 'tag', label: 'Selector', sub: 'app=web', info: 'The Service spec has <code>selector: {app: web}</code>. It does not list Pods by name.' },
+              { icon: 'repeat', label: 'EndpointSlice controller', sub: 'watches Pods', info: 'A controller in kube-controller-manager finds Pods matching the selector and tracks whether each one is <b>Ready</b>.' },
+              { icon: 'clipboard-list', label: 'EndpointSlices', sub: 'IP:port list', info: 'It writes EndpointSlice objects (labelled <code>kubernetes.io/service-name</code>) listing Pod IPs, ports and readiness. Large Services are split across several slices.' },
+              { icon: 'shuffle', label: 'kube-proxy', sub: 'programs rules', info: 'kube-proxy on every node watches Services and EndpointSlices and programs forwarding rules.' },
             ] },
           ],
           [
@@ -108,9 +108,9 @@ spec:
           ],
           [
             { type: 'flow', items: [
-              { icon: '🌍', label: 'nodeIP:30080', sub: 'nodePort', info: 'External clients hit any node on the nodePort.' },
-              { icon: '🎯', label: 'ClusterIP:80', sub: 'port', info: 'Inside the cluster, clients use the Service name or ClusterIP on <code>port</code>.' },
-              { icon: '🫛', label: 'PodIP:8080', sub: 'targetPort', info: 'kube-proxy rules translate the destination to a Pod IP and the targetPort.' },
+              { icon: 'earth', label: 'nodeIP:30080', sub: 'nodePort', info: 'External clients hit any node on the nodePort.' },
+              { icon: 'target', label: 'ClusterIP:80', sub: 'port', info: 'Inside the cluster, clients use the Service name or ClusterIP on <code>port</code>.' },
+              { icon: 'box', label: 'PodIP:8080', sub: 'targetPort', info: 'kube-proxy rules translate the destination to a Pod IP and the targetPort.' },
             ] },
             { type: 'callout', kind: 'trap', title: 'Mix-up to avoid', html: '<code>port</code> is what <b>callers</b> use; <code>targetPort</code> is what the <b>container</b> listens on. Getting them swapped is the most common Service bug.' },
           ],
@@ -140,18 +140,18 @@ spec:
       title: 'Following a request to a Pod',
       blocks: [
         { type: 'diagram', width: 900, height: 460,
-          caption: 'Press ▶ Play to follow the <code>frontend</code> Pod calling <code>http://web</code>. Click any box for details.',
+          caption: 'Press Play to follow the <code>frontend</code> Pod calling <code>http://web</code>. Click any box for details.',
           groups: [
             { x: 20, y: 20, w: 540, h: 160, label: 'Control plane & kube-system', color: 'blue' },
             { x: 20, y: 220, w: 430, h: 225, label: 'Node 1', color: 'green' },
             { x: 470, y: 220, w: 410, h: 225, label: 'Node 2', color: 'green' },
           ],
           nodes: [
-            { id: 'coredns', x: 40, y: 70, w: 140, h: 56, label: 'CoreDNS', icon: '📛', sub: 'cluster DNS', color: 'amber', info: 'Resolves <code>web.shop.svc.cluster.local</code> (or just <code>web</code> from the same namespace) to the Service’s ClusterIP. Every Pod’s <code>/etc/resolv.conf</code> points here.' },
+            { id: 'coredns', x: 40, y: 70, w: 140, h: 56, label: 'CoreDNS', icon: 'badge', sub: 'cluster DNS', color: 'amber', info: 'Resolves <code>web.shop.svc.cluster.local</code> (or just <code>web</code> from the same namespace) to the Service’s ClusterIP. Every Pod’s <code>/etc/resolv.conf</code> points here.' },
             { id: 'api', x: 200, y: 70, w: 150, h: 56, label: 'kube-apiserver', color: 'blue', info: 'Stores the Service and EndpointSlice objects. kube-proxy and CoreDNS watch it for changes.' },
             { id: 'eps', x: 370, y: 70, w: 170, h: 56, label: 'EndpointSlice', sub: 'Ready Pod IPs', color: 'teal', info: 'Maintained by the EndpointSlice controller. Lists IP:port of every Pod matching the selector and whether it is Ready.' },
             { id: 'svc', x: 610, y: 60, w: 250, h: 76, label: 'Service: web', sub: 'ClusterIP 10.96.40.12:80', color: 'purple', info: 'A virtual IP. No process listens on it: it exists only as rules on every node (iptables, IPVS, nftables or eBPF). Selector: <code>app=web</code>.' },
-            { id: 'client', x: 40, y: 265, w: 150, h: 56, label: 'frontend Pod', icon: '🫛', color: 'blue', round: true, info: 'The caller. It uses the DNS name, never a Pod IP, so it keeps working through rollouts and rescheduling.' },
+            { id: 'client', x: 40, y: 265, w: 150, h: 56, label: 'frontend Pod', icon: 'box', color: 'blue', round: true, info: 'The caller. It uses the DNS name, never a Pod IP, so it keeps working through rollouts and rescheduling.' },
             { id: 'kp', x: 230, y: 265, w: 200, h: 56, label: 'kube-proxy', sub: 'iptables / nftables', color: 'teal', info: 'Runs on every node (usually a DaemonSet). It does not sit in the data path: it programs kernel rules that rewrite the destination (DNAT) to a chosen backend.' },
             { id: 'podA', x: 140, y: 365, w: 170, h: 56, label: 'web Pod A', sub: '10.244.1.7:8080', color: 'green', round: true, info: 'A backend on the same node. Selection among backends is effectively random in iptables mode.' },
             { id: 'podB', x: 490, y: 265, w: 175, h: 56, label: 'web Pod B', sub: '10.244.2.4:8080', color: 'green', round: true, info: 'A backend on another node. The packet crosses nodes over the CNI network, Pod IP to Pod IP, with no NAT between Pods.' },
@@ -188,10 +188,10 @@ spec:
       title: 'kube-proxy modes and eBPF replacements',
       blocks: [
         { type: 'flip', items: [
-          { front: '⛓️ iptables mode', back: 'Default on Linux for years. Writes iptables NAT rules per Service and endpoint; backend picked at random. Rule evaluation grows with the number of Services.' },
-          { front: '⚖️ IPVS mode', back: 'Uses the kernel’s IP Virtual Server (hash tables) built for load balancing. Scales better for very many Services and offers algorithms such as round-robin and least-connection.' },
-          { front: '🧮 nftables mode', back: 'The newer mode using the nftables successor to iptables. Better performance and faster rule updates in large clusters.' },
-          { front: '🐝 eBPF (no kube-proxy)', back: 'CNIs such as Cilium load eBPF programs into the kernel to handle Service load balancing themselves, so kube-proxy can be removed entirely.' },
+          { front: 'iptables mode', back: 'Default on Linux for years. Writes iptables NAT rules per Service and endpoint; backend picked at random. Rule evaluation grows with the number of Services.' },
+          { front: 'IPVS mode', back: 'Uses the kernel’s IP Virtual Server (hash tables) built for load balancing. Scales better for very many Services and offers algorithms such as round-robin and least-connection.' },
+          { front: 'nftables mode', back: 'The newer mode using the nftables successor to iptables. Better performance and faster rule updates in large clusters.' },
+          { front: 'eBPF (no kube-proxy)', back: 'CNIs such as Cilium load eBPF programs into the kernel to handle Service load balancing themselves, so kube-proxy can be removed entirely.' },
         ] },
         { type: 'callout', kind: 'info', title: 'kube-proxy is not a proxy in the data path', html: 'Despite its name, in all modern modes kube-proxy only <b>programs</b> the kernel. Packets are forwarded by the kernel (netfilter, IPVS or eBPF), not by the kube-proxy process.' },
       ],
@@ -335,9 +335,9 @@ spec:
       blocks: [
         { type: 'text', html: 'A <b>service mesh</b> moves networking concerns out of application code into infrastructure. A <b>data plane</b> of proxies handles every service-to-service (<b>east-west</b>) call; a <b>control plane</b> configures them.' },
         { type: 'cards', cols: 3, items: [
-          { icon: '🔒', color: 'green', title: 'Security', text: '<b>Mutual TLS (mTLS)</b> between services with automatic certificate rotation; identity-based authorization policies.' },
-          { icon: '🚦', color: 'blue', title: 'Traffic management', text: 'Retries, timeouts, circuit breaking, canary splits, fault injection.' },
-          { icon: '🔭', color: 'amber', title: 'Observability', text: 'Golden metrics (latency, errors, traffic) and distributed traces for every call, without code changes.' },
+          { icon: 'lock', color: 'green', title: 'Security', text: '<b>Mutual TLS (mTLS)</b> between services with automatic certificate rotation; identity-based authorization policies.' },
+          { icon: 'traffic-cone', color: 'blue', title: 'Traffic management', text: 'Retries, timeouts, circuit breaking, canary splits, fault injection.' },
+          { icon: 'telescope', color: 'amber', title: 'Observability', text: 'Golden metrics (latency, errors, traffic) and distributed traces for every call, without code changes.' },
         ] },
         { type: 'compare', headers: ['', 'Istio', 'Linkerd'], rows: [
           ['Data plane', '<b>Envoy</b> sidecars, or <b>ambient</b> mode (sidecarless: per-node ztunnel + optional waypoint proxies)', 'Lightweight Rust micro-proxy (linkerd2-proxy) sidecars'],

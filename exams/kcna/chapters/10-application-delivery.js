@@ -2,7 +2,7 @@ KS.registerChapter('kcna', {
   id: 'delivery',
   title: 'Application Delivery',
   subtitle: 'CI/CD, GitOps with Argo CD and Flux, Helm, Kustomize and deployment strategies',
-  icon: '🚚',
+  icon: 'truck',
   minutes: 30,
   objectives: [
     'Distinguish continuous integration, continuous delivery and continuous deployment',
@@ -18,9 +18,9 @@ KS.registerChapter('kcna', {
       blocks: [
         { type: 'text', html: 'Cloud native teams ship small changes often. Three terms describe how far the automation goes, and the exam likes to test the difference between the two “CDs”.' },
         { type: 'cards', items: [
-          { icon: '🧪', color: 'blue', title: 'Continuous Integration (CI)', text: 'Every commit is merged to a shared branch, then <b>built and tested automatically</b>. The output is a tested artifact, e.g. a container image.' },
-          { icon: '📦', color: 'amber', title: 'Continuous Delivery', text: 'Every change that passes the pipeline is <b>ready to release</b>. Going to production still needs a <b>manual approval</b> (a button, a PR merge).' },
-          { icon: '🚀', color: 'green', title: 'Continuous Deployment', text: 'Every change that passes the pipeline goes to production <b>automatically</b>, with no human gate.' },
+          { icon: 'flask-conical', color: 'blue', title: 'Continuous Integration (CI)', text: 'Every commit is merged to a shared branch, then <b>built and tested automatically</b>. The output is a tested artifact, e.g. a container image.' },
+          { icon: 'package', color: 'amber', title: 'Continuous Delivery', text: 'Every change that passes the pipeline is <b>ready to release</b>. Going to production still needs a <b>manual approval</b> (a button, a PR merge).' },
+          { icon: 'rocket', color: 'green', title: 'Continuous Deployment', text: 'Every change that passes the pipeline goes to production <b>automatically</b>, with no human gate.' },
         ] },
         { type: 'compare', headers: ['', 'Continuous delivery', 'Continuous deployment'], rows: [
           ['Release to prod', 'Manual decision', 'Automatic'],
@@ -36,18 +36,18 @@ KS.registerChapter('kcna', {
       title: 'Stages of a typical container pipeline',
       blocks: [
         { type: 'flow', items: [
-          { icon: '✍️', label: 'Commit', sub: 'push / pull request', info: 'A push or pull request to the source repository triggers the pipeline through a webhook.' },
-          { icon: '🔨', label: 'Build', sub: 'compile + image', info: 'Compile the code and build an OCI image (Dockerfile, Buildpacks, Kaniko, BuildKit).' },
-          { icon: '🧪', label: 'Test', sub: 'unit, integration', info: 'Automated tests and linters. A failure stops the pipeline: fail fast, fix fast.' },
-          { icon: '🛡️', label: 'Scan & sign', sub: 'CVEs, SBOM', info: 'Scan the image for known vulnerabilities (e.g. Trivy), generate an SBOM, sign the image (e.g. Sigstore cosign).' },
-          { icon: '📤', label: 'Push', sub: 'to a registry', info: 'Push the image with an <b>immutable tag</b> (version or git SHA) to a registry such as Harbor, Docker Hub, GHCR or a cloud registry.' },
-          { icon: '🚢', label: 'Deploy', sub: 'push or GitOps pull', info: 'Either the pipeline runs <code>kubectl</code>/<code>helm</code> against the cluster (push), or it updates a config repo that a GitOps agent pulls.' },
-          { icon: '✅', label: 'Verify', sub: 'health, metrics', info: 'Check rollout status, smoke tests and metrics; roll back if they look bad.' },
-        ], caption: 'Click Step ▶ or any stage.' },
+          { icon: 'pen-line', label: 'Commit', sub: 'push / pull request', info: 'A push or pull request to the source repository triggers the pipeline through a webhook.' },
+          { icon: 'hammer', label: 'Build', sub: 'compile + image', info: 'Compile the code and build an OCI image (Dockerfile, Buildpacks, Kaniko, BuildKit).' },
+          { icon: 'flask-conical', label: 'Test', sub: 'unit, integration', info: 'Automated tests and linters. A failure stops the pipeline: fail fast, fix fast.' },
+          { icon: 'shield', label: 'Scan & sign', sub: 'CVEs, SBOM', info: 'Scan the image for known vulnerabilities (e.g. Trivy), generate an SBOM, sign the image (e.g. Sigstore cosign).' },
+          { icon: 'upload', label: 'Push', sub: 'to a registry', info: 'Push the image with an <b>immutable tag</b> (version or git SHA) to a registry such as Harbor, Docker Hub, GHCR or a cloud registry.' },
+          { icon: 'ship', label: 'Deploy', sub: 'push or GitOps pull', info: 'Either the pipeline runs <code>kubectl</code>/<code>helm</code> against the cluster (push), or it updates a config repo that a GitOps agent pulls.' },
+          { icon: 'circle-check', label: 'Verify', sub: 'health, metrics', info: 'Check rollout status, smoke tests and metrics; roll back if they look bad.' },
+        ], caption: 'Click Step or any stage.' },
         { type: 'cards', cols: 3, items: [
-          { icon: '🐱', color: 'purple', title: 'Tekton', text: 'Kubernetes-native CI/CD building blocks: <b>Tasks</b> and <b>Pipelines</b> are CRDs, and each step runs in a Pod. A CD Foundation project.' },
-          { icon: '🐙', color: 'gray', title: 'GitHub Actions', text: 'Workflows as YAML in <code>.github/workflows/</code>, triggered by repository events, run on hosted or self-hosted runners.' },
-          { icon: '🤵', color: 'red', title: 'Jenkins', text: 'Long-standing CI server driven by a <code>Jenkinsfile</code> and a large plugin ecosystem. Also a CD Foundation project.' },
+          { icon: 'cat', color: 'purple', title: 'Tekton', text: 'Kubernetes-native CI/CD building blocks: <b>Tasks</b> and <b>Pipelines</b> are CRDs, and each step runs in a Pod. A CD Foundation project.' },
+          { icon: 'git-branch', color: 'gray', title: 'GitHub Actions', text: 'Workflows as YAML in <code>.github/workflows/</code>, triggered by repository events, run on hosted or self-hosted runners.' },
+          { icon: 'user', color: 'red', title: 'Jenkins', text: 'Long-standing CI server driven by a <code>Jenkinsfile</code> and a large plugin ecosystem. Also a CD Foundation project.' },
         ] },
       ],
       tip: 'If an option says “runs pipeline steps as Pods using CRDs such as Task and Pipeline”, the answer is <b>Tekton</b>.',
@@ -89,10 +89,10 @@ containers:
       blocks: [
         { type: 'text', html: '<b>GitOps</b> manages infrastructure and applications by keeping the desired state in Git and letting an agent inside the cluster make reality match it. The CNCF OpenGitOps project (from the GitOps Working Group) defines four principles. Flip each card.' },
         { type: 'flip', items: [
-          { front: '1 · 📝 Declarative', back: 'The desired state of the whole system is expressed <b>declaratively</b> (YAML manifests, Helm charts, Kustomize overlays), not as scripts of steps.' },
-          { front: '2 · 🔒 Versioned and immutable', back: 'Desired state is stored in a way that keeps <b>complete version history</b> and is immutable. Git gives you history, review, audit and easy revert.' },
-          { front: '3 · ⬇️ Pulled automatically', back: 'Software agents <b>pull</b> the desired state from the source automatically. CI does not need cluster credentials.' },
-          { front: '4 · 🔁 Continuously reconciled', back: 'Agents <b>continuously observe</b> the actual state and attempt to apply the desired state, correcting drift.' },
+          { front: '1 · Declarative', back: 'The desired state of the whole system is expressed <b>declaratively</b> (YAML manifests, Helm charts, Kustomize overlays), not as scripts of steps.' },
+          { front: '2 · Versioned and immutable', back: 'Desired state is stored in a way that keeps <b>complete version history</b> and is immutable. Git gives you history, review, audit and easy revert.' },
+          { front: '3 · Pulled automatically', back: 'Software agents <b>pull</b> the desired state from the source automatically. CI does not need cluster credentials.' },
+          { front: '4 · Continuously reconciled', back: 'Agents <b>continuously observe</b> the actual state and attempt to apply the desired state, correcting drift.' },
         ] },
         { type: 'callout', kind: 'exam', title: 'Memorise the four words', html: '<b>Declarative · Versioned &amp; immutable · Pulled automatically · Continuously reconciled.</b> A distractor such as “imperative scripts” or “pushed by CI” breaks a principle.' },
       ],
@@ -104,17 +104,17 @@ containers:
       title: 'From commit to running Pods with GitOps',
       blocks: [
         { type: 'diagram', width: 900, height: 400,
-          caption: 'Press ▶ Play to follow one change from a developer commit to the cluster.',
+          caption: 'Press Play to follow one change from a developer commit to the cluster.',
           groups: [
             { x: 470, y: 170, w: 410, h: 215, label: 'Kubernetes cluster', color: 'blue' },
           ],
           nodes: [
-            { id: 'dev', x: 20, y: 60, w: 130, h: 56, label: 'Developer', icon: '👩‍💻', color: 'gray', info: 'Writes code and opens a pull request. Never runs <code>kubectl apply</code> against production in a GitOps setup.' },
+            { id: 'dev', x: 20, y: 60, w: 130, h: 56, label: 'Developer', icon: 'user-round', color: 'gray', info: 'Writes code and opens a pull request. Never runs <code>kubectl apply</code> against production in a GitOps setup.' },
             { id: 'app', x: 190, y: 60, w: 150, h: 56, label: 'App repo', sub: 'source code', color: 'purple', info: 'Holds application source and the Dockerfile. Many teams keep manifests in a <b>separate config repo</b> so app commits and deployment changes have separate history and access rules.' },
-            { id: 'ci', x: 380, y: 60, w: 150, h: 56, label: 'CI pipeline', icon: '🔨', color: 'amber', info: 'Builds, tests, scans and pushes the image, then updates the config repo (commit or PR) with the new immutable tag. It needs <b>no cluster credentials</b>.' },
-            { id: 'reg', x: 600, y: 60, w: 160, h: 56, label: 'Image registry', icon: '🗃️', color: 'pink', info: 'Stores the built image, e.g. <code>ghcr.io/acme/web:1.4.1</code>. Harbor is a CNCF graduated registry.' },
+            { id: 'ci', x: 380, y: 60, w: 150, h: 56, label: 'CI pipeline', icon: 'hammer', color: 'amber', info: 'Builds, tests, scans and pushes the image, then updates the config repo (commit or PR) with the new immutable tag. It needs <b>no cluster credentials</b>.' },
+            { id: 'reg', x: 600, y: 60, w: 160, h: 56, label: 'Image registry', icon: 'archive', color: 'pink', info: 'Stores the built image, e.g. <code>ghcr.io/acme/web:1.4.1</code>. Harbor is a CNCF graduated registry.' },
             { id: 'cfg', x: 190, y: 250, w: 170, h: 60, label: 'Config repo', sub: 'manifests / charts', color: 'green', info: 'The <b>single source of truth</b> for desired state: YAML, Helm values or Kustomize overlays per environment. Every change is a reviewed, versioned commit.' },
-            { id: 'agent', x: 495, y: 210, w: 170, h: 60, label: 'Argo CD / Flux', icon: '🔁', sub: 'GitOps agent', color: 'teal', info: 'Runs <b>inside</b> the cluster. Polls or receives webhooks from the config repo, renders manifests, compares them with the live state and applies the difference.' },
+            { id: 'agent', x: 495, y: 210, w: 170, h: 60, label: 'Argo CD / Flux', icon: 'repeat', sub: 'GitOps agent', color: 'teal', info: 'Runs <b>inside</b> the cluster. Polls or receives webhooks from the config repo, renders manifests, compares them with the live state and applies the difference.' },
             { id: 'api', x: 700, y: 210, w: 160, h: 60, label: 'kube-apiserver', color: 'blue', info: 'Receives the applied objects. From here the normal controllers, scheduler and kubelets take over.' },
             { id: 'pods', x: 600, y: 310, w: 170, h: 56, label: 'Deployment\nPods v1.4.1', color: 'blue', fs: 12.5, info: 'The Deployment rolls out new Pods; kubelets pull the new image from the registry.' },
           ],
@@ -170,8 +170,8 @@ containers:
           ['Progressive delivery add-on', 'Argo Rollouts', 'Flagger'],
         ] },
         { type: 'cards', cols: 2, items: [
-          { icon: '🧭', color: 'amber', title: 'Drift detection', text: 'The agent compares rendered manifests with live objects. Argo CD shows an app as <b>Synced</b> or <b>OutOfSync</b> and <b>Healthy</b>/<b>Degraded</b>.' },
-          { icon: '🩹', color: 'green', title: 'Self-heal & prune', text: 'With automated sync, <b>self-heal</b> reverts manual changes made with <code>kubectl edit</code>; <b>prune</b> deletes objects that were removed from Git.' },
+          { icon: 'compass', color: 'amber', title: 'Drift detection', text: 'The agent compares rendered manifests with live objects. Argo CD shows an app as <b>Synced</b> or <b>OutOfSync</b> and <b>Healthy</b>/<b>Degraded</b>.' },
+          { icon: 'bandage', color: 'green', title: 'Self-heal & prune', text: 'With automated sync, <b>self-heal</b> reverts manual changes made with <code>kubectl edit</code>; <b>prune</b> deletes objects that were removed from Git.' },
         ] },
         { type: 'callout', kind: 'trap', title: 'Not the same thing', html: '<b>Argo CD</b> = GitOps continuous delivery. <b>Argo Workflows</b> = container-native workflow engine (DAGs of steps, often for CI or data jobs). <b>Argo Rollouts</b> = canary/blue-green controller. All live under the graduated Argo project.' },
       ],
@@ -185,10 +185,10 @@ containers:
         { type: 'cols', ratio: '1fr 1.15fr', cols: [
           [
             { type: 'cards', cols: 1, items: [
-              { icon: '📦', color: 'blue', title: 'Chart', text: 'A package: <code>Chart.yaml</code> (metadata), <code>values.yaml</code> (defaults) and <code>templates/</code> (Go-templated manifests).' },
-              { icon: '🎛️', color: 'amber', title: 'Values', text: 'Configuration that fills the templates. Override with <code>-f my-values.yaml</code> or <code>--set key=value</code>.' },
-              { icon: '🏷️', color: 'green', title: 'Release', text: 'One installed instance of a chart in a cluster. Each upgrade creates a new numbered <b>revision</b>.' },
-              { icon: '🏪', color: 'purple', title: 'Repository', text: 'Where charts are published: an HTTP chart repo or an OCI registry. Artifact Hub helps you find them.' },
+              { icon: 'package', color: 'blue', title: 'Chart', text: 'A package: <code>Chart.yaml</code> (metadata), <code>values.yaml</code> (defaults) and <code>templates/</code> (Go-templated manifests).' },
+              { icon: 'sliders-horizontal', color: 'amber', title: 'Values', text: 'Configuration that fills the templates. Override with <code>-f my-values.yaml</code> or <code>--set key=value</code>.' },
+              { icon: 'tag', color: 'green', title: 'Release', text: 'One installed instance of a chart in a cluster. Each upgrade creates a new numbered <b>revision</b>.' },
+              { icon: 'store', color: 'purple', title: 'Repository', text: 'Where charts are published: an HTTP chart repo or an OCI registry. Artifact Hub helps you find them.' },
             ] },
           ],
           [
@@ -293,8 +293,8 @@ spec:
           ['Shadow (mirroring)', 'Copy live requests to the new version; its responses are discarded', 'Tests with real traffic, zero user impact', 'Double load; side effects such as writes or payments'],
         ] },
         { type: 'cards', cols: 2, items: [
-          { icon: '🐤', color: 'amber', title: 'Progressive delivery', text: 'Automating canary or blue/green with <b>metric analysis</b>: shift traffic step by step, query Prometheus, and automatically promote or roll back.' },
-          { icon: '🛠️', color: 'teal', title: 'Tools', text: '<b>Argo Rollouts</b>: a <code>Rollout</code> CRD that replaces the Deployment, with canary/blue-green steps and analysis. <b>Flagger</b> (Flux family): automates canaries using a service mesh or ingress.' },
+          { icon: 'bird', color: 'amber', title: 'Progressive delivery', text: 'Automating canary or blue/green with <b>metric analysis</b>: shift traffic step by step, query Prometheus, and automatically promote or roll back.' },
+          { icon: 'wrench', color: 'teal', title: 'Tools', text: '<b>Argo Rollouts</b>: a <code>Rollout</code> CRD that replaces the Deployment, with canary/blue-green steps and analysis. <b>Flagger</b> (Flux family): automates canaries using a service mesh or ingress.' },
         ] },
       ],
       tip: '“Release to 5% of users first and watch error rates” = <b>canary</b>. “Two full environments, flip all traffic” = <b>blue/green</b>. “Version B only for users with a cookie” = <b>A/B</b>. “Duplicate traffic, ignore responses” = <b>shadow</b>.',
@@ -306,10 +306,10 @@ spec:
       blocks: [
         { type: 'text', html: 'Stateless apps fit a Deployment. Complex software (databases, message queues, monitoring stacks) needs <b>day-2 knowledge</b>: backups, failover, upgrades in the right order. An <b>Operator</b> encodes that human operator knowledge in software.' },
         { type: 'flow', items: [
-          { icon: '📐', label: 'CRD', sub: 'new API kind', info: 'A CustomResourceDefinition adds a kind such as <code>PostgresCluster</code> or <code>Prometheus</code> to the API.' },
-          { icon: '📝', label: 'Custom resource', sub: 'your desired state', info: 'You write a short object: “3 replicas, version 16, daily backups”. It is stored in etcd like any other object.' },
-          { icon: '🔁', label: 'Controller', sub: 'reconciles', info: 'The operator’s controller watches those objects and creates StatefulSets, Services, Secrets, CronJobs… and keeps them correct.' },
-          { icon: '🩺', label: 'Day 2', sub: 'upgrade, backup, heal', info: 'It performs ordered upgrades, failover and backups, the jobs a human operator would do.' },
+          { icon: 'ruler', label: 'CRD', sub: 'new API kind', info: 'A CustomResourceDefinition adds a kind such as <code>PostgresCluster</code> or <code>Prometheus</code> to the API.' },
+          { icon: 'notebook-pen', label: 'Custom resource', sub: 'your desired state', info: 'You write a short object: “3 replicas, version 16, daily backups”. It is stored in etcd like any other object.' },
+          { icon: 'repeat', label: 'Controller', sub: 'reconciles', info: 'The operator’s controller watches those objects and creates StatefulSets, Services, Secrets, CronJobs… and keeps them correct.' },
+          { icon: 'stethoscope', label: 'Day 2', sub: 'upgrade, backup, heal', info: 'It performs ordered upgrades, failover and backups, the jobs a human operator would do.' },
         ] },
         { type: 'callout', kind: 'exam', title: 'Operator = CRD + controller', html: 'An Operator is a custom controller that reconciles custom resources using domain knowledge. Examples: Prometheus Operator, CloudNativePG, cert-manager. Argo CD itself is configured with CRDs (<code>Application</code>), and so is Flux.' },
       ],

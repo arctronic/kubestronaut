@@ -207,7 +207,7 @@
   KS.refHtml = function (q) {
     const refs = Array.isArray(q.ref) ? q.ref : q.ref ? [q.ref] : [];
     if (!refs.length) return '';
-    return '<div class="ref">📖 Source: ' + refs.map((u) => `<a href="${KS.esc(u)}" target="_blank" rel="noopener">${KS.esc(KS.refLabel(u))} ↗</a>`).join(' · ') + '</div>';
+    return '<div class="ref">' + KS.icon('book-marked') + '<span>Source: ' + refs.map((u) => `<a href="${KS.esc(u)}" target="_blank" rel="noopener">${KS.esc(KS.refLabel(u))}${KS.icon('external-link', 'xs')}</a>`).join(' · ') + '</span></div>';
   };
   KS.toast = function (msg) { const t = KS.h('div', { class: 'toast', text: msg }); document.body.appendChild(t); setTimeout(() => t.remove(), 2200); };
   KS.ring = function (pct, color, size) {

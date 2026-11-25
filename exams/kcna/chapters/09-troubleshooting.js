@@ -2,7 +2,7 @@ KS.registerChapter('kcna', {
   id: 'troubleshooting',
   title: 'Troubleshooting',
   subtitle: 'From a red status to a root cause: Pods, nodes, Services, DNS and the control plane',
-  icon: '🩺',
+  icon: 'stethoscope',
   minutes: 30,
   objectives: [
     'Apply a systematic workflow: get → describe → events → logs → exec',
@@ -18,12 +18,12 @@ KS.registerChapter('kcna', {
       blocks: [
         { type: 'text', html: 'Almost every Kubernetes problem can be narrowed down with the same five commands, from the widest view to the most intrusive. Start broad, read what Kubernetes already tells you, and only then go inside the container.' },
         { type: 'flow', items: [
-          { icon: '📋', label: 'get', sub: 'what is the status?', info: '<code>kubectl get pods -o wide</code> shows STATUS, RESTARTS, READY and the node. The status column alone usually tells you which branch of the decision tree you are in.' },
-          { icon: '🔍', label: 'describe', sub: 'conditions + events', info: '<code>kubectl describe pod web-5d8f</code> shows container states, last termination reason and exit code, conditions, volumes, and the <b>Events</b> at the bottom.' },
-          { icon: '📰', label: 'events', sub: 'what happened, in order', info: '<code>kubectl get events --sort-by=.metadata.creationTimestamp</code> lists scheduling failures, image pulls, probe failures and kills for the whole namespace.' },
-          { icon: '📜', label: 'logs', sub: 'what the app said', info: '<code>kubectl logs web-5d8f --previous</code> shows the output of the <b>crashed</b> container instance, which is what you need for CrashLoopBackOff.' },
-          { icon: '🐚', label: 'exec', sub: 'look from inside', info: '<code>kubectl exec -it web-5d8f -- sh</code> to check files, env vars, DNS and connectivity from inside. Needs a running container (and a shell in the image); otherwise use <code>kubectl debug</code>.' },
-        ], caption: 'Click Step ▶ or any box.' },
+          { icon: 'clipboard-list', label: 'get', sub: 'what is the status?', info: '<code>kubectl get pods -o wide</code> shows STATUS, RESTARTS, READY and the node. The status column alone usually tells you which branch of the decision tree you are in.' },
+          { icon: 'search', label: 'describe', sub: 'conditions + events', info: '<code>kubectl describe pod web-5d8f</code> shows container states, last termination reason and exit code, conditions, volumes, and the <b>Events</b> at the bottom.' },
+          { icon: 'newspaper', label: 'events', sub: 'what happened, in order', info: '<code>kubectl get events --sort-by=.metadata.creationTimestamp</code> lists scheduling failures, image pulls, probe failures and kills for the whole namespace.' },
+          { icon: 'scroll-text', label: 'logs', sub: 'what the app said', info: '<code>kubectl logs web-5d8f --previous</code> shows the output of the <b>crashed</b> container instance, which is what you need for CrashLoopBackOff.' },
+          { icon: 'terminal', label: 'exec', sub: 'look from inside', info: '<code>kubectl exec -it web-5d8f -- sh</code> to check files, env vars, DNS and connectivity from inside. Needs a running container (and a shell in the image); otherwise use <code>kubectl debug</code>.' },
+        ], caption: 'Click Step or any box.' },
         { type: 'callout', kind: 'exam', title: 'Which command shows events?', html: '<code>kubectl describe</code> (events for one object) and <code>kubectl get events</code> (all events in a namespace). <code>kubectl logs</code> shows <b>container output</b>, never Kubernetes events.' },
       ],
       tip: 'Events are kept only for a limited time (one hour by default), so look at them early. Old problems may have no events left.',
@@ -34,9 +34,9 @@ KS.registerChapter('kcna', {
       title: 'Where do I look first?',
       blocks: [
         { type: 'diagram', width: 900, height: 420,
-          caption: 'Press ▶ Play to walk each branch, or click a box for details.',
+          caption: 'Press Play to walk each branch, or click a box for details.',
           nodes: [
-            { id: 'start', x: 345, y: 15, w: 210, h: 54, label: 'kubectl get pods\n-o wide', icon: '📋', color: 'gray', info: 'Always start here: STATUS, READY, RESTARTS, AGE and NODE give you the branch to follow.' },
+            { id: 'start', x: 345, y: 15, w: 210, h: 54, label: 'kubectl get pods\n-o wide', icon: 'clipboard-list', color: 'gray', info: 'Always start here: STATUS, READY, RESTARTS, AGE and NODE give you the branch to follow.' },
             { id: 'pend', x: 15, y: 130, w: 155, h: 56, label: 'Pending', color: 'amber', info: 'The Pod exists but has <b>not been scheduled</b> (no node), or is waiting for a volume to bind.' },
             { id: 'crash', x: 195, y: 130, w: 160, h: 56, label: 'CrashLoopBackOff', color: 'red', fs: 12.5, info: 'The container starts, exits, and the kubelet restarts it with an increasing back-off delay (up to 5 minutes).' },
             { id: 'img', x: 375, y: 130, w: 160, h: 56, label: 'ImagePullBackOff\nErrImagePull', color: 'pink', fs: 12, info: 'The kubelet cannot pull the image. ErrImagePull is the first failure; ImagePullBackOff means it is waiting before retrying.' },
@@ -126,10 +126,10 @@ Warning  FailedScheduling  default-scheduler  0/4 nodes are available:
           ],
           [
             { type: 'cards', cols: 1, items: [
-              { icon: '📏', color: 'amber', title: 'Insufficient cpu / memory', text: 'Lower the requests, free capacity, or add nodes (Cluster Autoscaler does this automatically).' },
-              { icon: '🚫', color: 'red', title: 'Untolerated taint', text: 'Add a matching toleration, or remove the taint if it is stale (e.g. a cordoned or NotReady node).' },
-              { icon: '🧲', color: 'purple', title: 'Affinity / nodeSelector', text: 'Fix the label on the node or the selector in the Pod.' },
-              { icon: '💾', color: 'teal', title: 'Unbound PersistentVolumeClaim', text: 'The PVC is Pending: no matching PV or StorageClass. Check <code>kubectl describe pvc</code>.' },
+              { icon: 'ruler', color: 'amber', title: 'Insufficient cpu / memory', text: 'Lower the requests, free capacity, or add nodes (Cluster Autoscaler does this automatically).' },
+              { icon: 'ban', color: 'red', title: 'Untolerated taint', text: 'Add a matching toleration, or remove the taint if it is stale (e.g. a cordoned or NotReady node).' },
+              { icon: 'magnet', color: 'purple', title: 'Affinity / nodeSelector', text: 'Fix the label on the node or the selector in the Pod.' },
+              { icon: 'save', color: 'teal', title: 'Unbound PersistentVolumeClaim', text: 'The PVC is Pending: no matching PV or StorageClass. Check <code>kubectl describe pvc</code>.' },
             ] },
           ],
         ] },
@@ -175,12 +175,12 @@ kubectl get pod api-7c9d -o jsonpath='{.status.containerStatuses[0].lastState}'`
       title: 'Image and configuration failures: flip to reveal',
       blocks: [
         { type: 'flip', items: [
-          { front: '🖼️ ErrImagePull', back: 'First failed pull: image or tag does not exist, typo in registry host, authentication denied.' },
-          { front: '⏳ ImagePullBackOff', back: 'Same problem, retried with back-off. Read the event message; it names the image and the error.' },
-          { front: '🔐 Private registry', back: 'Pull fails with “unauthorized”: create a <code>docker-registry</code> Secret and reference it in <code>imagePullSecrets</code> (or on the ServiceAccount).' },
-          { front: '🧾 CreateContainerConfigError', back: 'The image is pulled, but a referenced ConfigMap or Secret (or a key in it) is missing, so the container cannot be configured.' },
-          { front: '🧱 ContainerCreating', back: 'Usually a volume: PVC cannot attach (wrong zone, RWO volume still attached elsewhere), missing Secret for a secret volume, or the CNI plugin failing to set up the network.' },
-          { front: '🧹 Stuck Terminating', back: 'A finalizer is waiting for a controller, or the node is gone. Last resort: <code>kubectl delete pod X --grace-period=0 --force</code>.' },
+          { front: 'ErrImagePull', back: 'First failed pull: image or tag does not exist, typo in registry host, authentication denied.' },
+          { front: 'ImagePullBackOff', back: 'Same problem, retried with back-off. Read the event message; it names the image and the error.' },
+          { front: 'Private registry', back: 'Pull fails with “unauthorized”: create a <code>docker-registry</code> Secret and reference it in <code>imagePullSecrets</code> (or on the ServiceAccount).' },
+          { front: 'CreateContainerConfigError', back: 'The image is pulled, but a referenced ConfigMap or Secret (or a key in it) is missing, so the container cannot be configured.' },
+          { front: 'ContainerCreating', back: 'Usually a volume: PVC cannot attach (wrong zone, RWO volume still attached elsewhere), missing Secret for a secret volume, or the CNI plugin failing to set up the network.' },
+          { front: 'Stuck Terminating', back: 'A finalizer is waiting for a controller, or the node is gone. Last resort: <code>kubectl delete pod X --grace-period=0 --force</code>.' },
         ] },
         { type: 'check', q: 'A Pod shows <code>CreateContainerConfigError</code>. The image exists and pulls fine. What is the most likely cause?', options: ['The node is out of memory', 'A ConfigMap or Secret referenced by the Pod does not exist', 'The readiness probe is failing', 'The image tag is wrong'], answer: 1, explain: 'CreateContainerConfigError happens <b>after</b> the image pull, when building the container config: typically an env var or envFrom referencing a <b>missing ConfigMap/Secret or key</b>. A wrong tag gives ErrImagePull; a failing readiness probe leaves the Pod Running but not Ready; memory pressure leads to eviction or OOMKilled.', ref: 'https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/' },
       ],
@@ -289,13 +289,13 @@ crictl ps -a | grep kube-apiserver`, notes: {
       title: 'The Service does not answer',
       blocks: [
         { type: 'flow', items: [
-          { icon: '🏷️', label: 'Selector', sub: 'matches Pod labels?', info: 'The most common bug. <code>kubectl get svc api -o wide</code> shows the selector; compare with <code>kubectl get pods --show-labels</code>. One typo (app=api vs app=API) means zero backends.' },
-          { icon: '📇', label: 'EndpointSlices', sub: 'any addresses?', info: '<code>kubectl get endpointslices -l kubernetes.io/service-name=api</code>. Empty = selector mismatch or no <b>Ready</b> Pods. The older Endpoints API is deprecated in favour of EndpointSlices.' },
-          { icon: '✅', label: 'Readiness', sub: 'Pods Ready?', info: 'Pods failing their readiness probe are removed from endpoints even though they are Running.' },
-          { icon: '🔢', label: 'Ports', sub: 'targetPort correct?', info: '<code>port</code> is what clients call; <code>targetPort</code> must equal the port the container actually listens on. Wrong targetPort = connection refused.' },
-          { icon: '🧱', label: 'NetworkPolicy', sub: 'traffic allowed?', info: 'A default-deny policy in the namespace silently drops traffic. Check <code>kubectl get networkpolicy -n shop</code>.' },
-          { icon: '🔀', label: 'kube-proxy / CNI', sub: 'node plumbing', info: 'Last: kube-proxy (or its eBPF replacement) and the CNI plugin Pods in kube-system must be healthy.' },
-        ], caption: 'Check from top to bottom. Click Step ▶ or any box.' },
+          { icon: 'tag', label: 'Selector', sub: 'matches Pod labels?', info: 'The most common bug. <code>kubectl get svc api -o wide</code> shows the selector; compare with <code>kubectl get pods --show-labels</code>. One typo (app=api vs app=API) means zero backends.' },
+          { icon: 'contact', label: 'EndpointSlices', sub: 'any addresses?', info: '<code>kubectl get endpointslices -l kubernetes.io/service-name=api</code>. Empty = selector mismatch or no <b>Ready</b> Pods. The older Endpoints API is deprecated in favour of EndpointSlices.' },
+          { icon: 'circle-check', label: 'Readiness', sub: 'Pods Ready?', info: 'Pods failing their readiness probe are removed from endpoints even though they are Running.' },
+          { icon: 'hash', label: 'Ports', sub: 'targetPort correct?', info: '<code>port</code> is what clients call; <code>targetPort</code> must equal the port the container actually listens on. Wrong targetPort = connection refused.' },
+          { icon: 'blocks', label: 'NetworkPolicy', sub: 'traffic allowed?', info: 'A default-deny policy in the namespace silently drops traffic. Check <code>kubectl get networkpolicy -n shop</code>.' },
+          { icon: 'shuffle', label: 'kube-proxy / CNI', sub: 'node plumbing', info: 'Last: kube-proxy (or its eBPF replacement) and the CNI plugin Pods in kube-system must be healthy.' },
+        ], caption: 'Check from top to bottom. Click Step or any box.' },
         { type: 'code', lang: 'bash', title: 'service checks', code: `
 kubectl get svc api -n shop -o wide
 kubectl get endpointslices -n shop -l kubernetes.io/service-name=api

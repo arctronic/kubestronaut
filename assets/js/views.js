@@ -20,30 +20,38 @@
     if (s < 60) return 'just now'; if (s < 3600) return Math.round(s / 60) + ' min ago';
     if (s < 86400) return Math.round(s / 3600) + ' h ago'; return Math.round(s / 86400) + ' d ago';
   }
-  function icon(name) {
-    const P = {
-      check: '<path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>',
-      play: '<path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/>',
-      slides: '<rect x="3" y="4" width="18" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
-      quiz: '<rect x="4" y="3" width="16" height="18" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
-      cards: '<rect x="3" y="6" width="14" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M7 3h12a2 2 0 0 1 2 2v12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
-      timer: '<circle cx="12" cy="13" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 9v4l2.5 2M9 2h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
-      flame: '<path d="M12 22c4 0 7-2.8 7-6.8 0-3.6-2.4-5.6-3.8-8.2-.4 1.8-1.4 3-2.6 3.6.2-3.2-1.2-6.2-4.1-8.6.3 3.5-1.6 5.7-3.2 7.6C4 11.2 5 13.4 5 15.2 5 19.2 8 22 12 22z" fill="currentColor"/>',
-      notes: '<path d="M5 3h10l4 4v14H5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 11h8M8 15h8M8 7h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
-      menu: '<path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
-      left: '<path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
-      right: '<path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
-      close: '<path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
-      chevron: '<path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
-      moon: '<path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>',
-      gear: '<circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.8v2.6M12 18.6v2.6M2.8 12h2.6M18.6 12h2.6M5.5 5.5l1.8 1.8M16.7 16.7l1.8 1.8M5.5 18.5l1.8-1.8M16.7 7.3l1.8-1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
-      trophy: '<path d="M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4M12 14v4M8 21h8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
-      book: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z M4 19V5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>',
-      lock: '<rect x="5" y="11" width="14" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.8"/>',
-    };
-    return `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${P[name] || ''}</svg>`;
-  }
+  const ALIAS = { slides: 'presentation', quiz: 'clipboard-list', cards: 'layers', notes: 'notebook-pen', left: 'chevron-left', right: 'chevron-right', close: 'x', chevron: 'chevron-down', gear: 'settings', book: 'book-open' };
+  function icon(name, cls) { return KS.icon(ALIAS[name] || name, cls); }
   const I = (name, cls) => h('span', { class: 'icw' + (cls ? ' ' + cls : ''), html: icon(name) });
+
+  /* shadcn-style dropdown (select) with keyboard support */
+  function dropdown(opts) {
+    let value = opts.value;
+    const wrap = h('div', { class: 'dd' + (opts.align === 'end' ? ' end' : '') });
+    const cur = () => (opts.options.find((o) => o.value === value) || {}).label || '';
+    const lbl = h('span', { text: cur() });
+    const btn = h('button', { class: 'dd-trigger', type: 'button', 'aria-haspopup': 'listbox', 'aria-expanded': 'false' }, lbl, I('chevrons-up-down', 'dd-chev'));
+    const items = opts.options.map((o) => h('button', { class: 'dd-item' + (o.value === value ? ' on' : ''), type: 'button', role: 'option', 'aria-selected': o.value === value ? 'true' : 'false', onclick: () => pick(o) },
+      h('span', { class: 'dd-check', html: o.value === value ? icon('check') : '' }), h('span', { text: o.label })));
+    const menu = h('div', { class: 'dd-menu', role: 'listbox' }, opts.label ? h('div', { class: 'dd-label', text: opts.label }) : null, items);
+    function open() { wrap.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); (items.find((x) => x.classList.contains('on')) || items[0]).focus(); setTimeout(() => document.addEventListener('mousedown', outside), 0); }
+    function close() { wrap.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); document.removeEventListener('mousedown', outside); }
+    function outside(ev) { if (!wrap.contains(ev.target)) close(); }
+    function pick(o) { value = o.value; lbl.textContent = o.label; items.forEach((x, i) => { const on = opts.options[i].value === value; x.classList.toggle('on', on); x.querySelector('.dd-check').innerHTML = on ? icon('check') : ''; }); close(); btn.focus(); opts.onChange && opts.onChange(value); }
+    btn.addEventListener('click', () => (wrap.classList.contains('open') ? close() : open()));
+    wrap.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Escape') { close(); btn.focus(); }
+      else if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') {
+        ev.preventDefault();
+        if (!wrap.classList.contains('open')) return open();
+        const i = items.indexOf(document.activeElement), n = items.length;
+        items[(i + (ev.key === 'ArrowDown' ? 1 : n - 1)) % n].focus();
+      }
+    });
+    KS.onLeave(() => document.removeEventListener('mousedown', outside));
+    wrap.appendChild(btn); wrap.appendChild(menu);
+    return wrap;
+  }
 
   /* Generated course artwork: gradient + hex lattice + orbit, unique per course color. */
   function courseArt(m, opts) {
@@ -117,14 +125,14 @@
   }
 
   /* ================================================================ shell */
-  const LOGO = `<svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0056d2"/><stop offset="1" stop-color="#6c5ce7"/></linearGradient></defs><path d="M32 3l25 12v34L32 61 7 49V15z" fill="url(#lg)"/><circle cx="32" cy="32" r="11" fill="none" stroke="#fff" stroke-width="3.4"/><g stroke="#fff" stroke-width="3.4" stroke-linecap="round"><path d="M32 13v8M32 43v8M13 32h8M43 32h8M18.6 18.6l5.7 5.7M39.7 39.7l5.7 5.7M18.6 45.4l5.7-5.7M39.7 24.3l5.7-5.7"/></g><circle cx="32" cy="32" r="3.6" fill="#fff"/></svg>`;
+  const LOGO = `<svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="lgb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2b6cf0"/><stop offset="1" stop-color="#0a3a9e"/></linearGradient></defs><rect width="32" height="32" rx="8" fill="url(#lgb)"/><polygon points="16.00,9.20 21.63,11.91 23.02,18.00 19.12,22.89 12.88,22.89 8.98,18.00 10.37,11.91" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><ellipse cx="16" cy="16.4" rx="13.2" ry="4.6" transform="rotate(-24 16 16.4)" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="1.3"/><circle cx="16" cy="16.4" r="1.9" fill="#fff"/><circle cx="24.80" cy="9.59" r="1.9" fill="#7fd1ff" stroke="#0a3a9e" stroke-width=".8"/></svg>`;
 
   function topbar(opts) {
     opts = opts || {};
     const streak = S().streak();
     return h('header', { class: 'topbar' + (opts.compact ? ' compact' : '') },
       opts.left || null,
-      h('a', { class: 'brand', href: '#/', html: LOGO + '<span class="wordmark">kubestronaut<b>academy</b></span>' }),
+      h('a', { class: 'brand', href: '#/', html: LOGO + '<span class="wordmark">Kubestronaut<b>Academy</b></span>' }),
       h('nav', { class: 'topnav' },
         h('a', { href: '#/', class: opts.nav === 'home' ? 'on' : '' }, 'Home'),
         h('a', { href: '#/exam/kcna', class: opts.nav === 'kcna' ? 'on' : '' }, 'KCNA course'),
@@ -142,7 +150,7 @@
     root.appendChild(topbar(opts));
     root.appendChild(content);
     if (!opts.noFooter) root.appendChild(h('footer', { class: 'footer' },
-      h('div', { html: LOGO + ' <b>kubestronaut academy</b>: personal prep for KCNA · KCSA · CKAD · CKA · CKS' }),
+      h('div', { class: 'foot-brand', html: LOGO + ' <b>Kubestronaut Academy</b><span class="muted">Personal prep for KCNA, KCSA, CKAD, CKA and CKS</span>' }),
       h('div', { class: 'muted', html: 'Progress, notes and streaks are saved in this browser (local storage). <a href="#/data">Backup / restore</a>' })));
     return root;
   }
@@ -200,15 +208,14 @@
       }));
 
       const events = (st.events || []).slice(0, 8);
-      const feed = events.length ? h('ul', { class: 'feed' }, events.map((ev) => h('li', null, h('span', { class: 'feed-ic', text: ev.icon }), h('span', { class: 'feed-tx', html: ev.text }), h('span', { class: 'muted small', text: ago(ev.t) })))) : h('p', { class: 'muted', text: 'Your completed lessons, quiz scores and mock results will show up here.' });
+      const feed = events.length ? h('ul', { class: 'feed' }, events.map((ev) => h('li', null, h('span', { class: 'feed-ic', html: icon(KS.iconNames.includes(ev.icon) ? ev.icon : 'circle-dot') }), h('span', { class: 'feed-tx', html: ev.text }), h('span', { class: 'muted small', text: ago(ev.t) })))) : h('p', { class: 'muted', text: 'Your completed lessons, quiz scores and mock results will show up here.' });
 
-      const goalSel = h('select', { class: 'select', onchange: (ev) => { S().goal = +ev.target.value; KS.dispatch(); } },
-        [1, 2, 3, 4, 5, 6, 7].map((n) => h('option', { value: n, selected: n === S().goal ? true : null }, n + (n === 1 ? ' day' : ' days'))));
+      const goalSel = dropdown({ value: S().goal, label: 'Study days per week', align: 'end', options: [1, 2, 3, 4, 5, 6, 7].map((n) => ({ value: n, label: n + (n === 1 ? ' day' : ' days') + ' / week' })), onChange: (v) => { S().goal = v; KS.dispatch(); } });
       const goal = h('section', { class: 'card side-card' },
         h('div', { class: 'card-head' }, h('h3', { text: 'Weekly goal' }), goalSel),
         h('div', { class: 'week' }, week.map((d) => h('div', { class: 'wday' + (d.active ? ' on' : '') + (d.today ? ' today' : '') + (d.future ? ' future' : ''), title: d.key },
           h('span', { class: 'wcircle', html: d.active ? icon('check') : '' }), h('span', { class: 'wlbl', text: d.label })))),
-        h('p', { class: 'goal-txt', html: activeDays >= S().goal ? `🎉 Goal reached: <b>${activeDays}</b> study days this week.` : `<b>${activeDays}</b> of <b>${S().goal}</b> study days this week. ${streak ? `🔥 ${streak}-day streak.` : 'Study today to start a streak.'}` }));
+        h('p', { class: 'goal-txt', html: activeDays >= S().goal ? `${icon('party-popper')} Goal reached: <b>${activeDays}</b> study days this week.` : `<b>${activeDays}</b> of <b>${S().goal}</b> study days this week. ${streak ? `${streak}-day streak.` : 'Study today to start a streak.'}` }));
 
       const stats = h('section', { class: 'card side-card' },
         h('h3', { text: 'Your learning' }),
@@ -221,7 +228,7 @@
       const ready = exams.map((e) => {
         const acc = domainAccuracy(e);
         return h('section', { class: 'card side-card' },
-          h('div', { class: 'card-head' }, h('h3', { text: e.short + ' readiness' }), h('a', { class: 'small', href: `#/exam/${e.id}/grades` }, 'Grades →')),
+          h('div', { class: 'card-head' }, h('h3', { text: e.short + ' readiness' }), h('a', { class: 'small link-arrow', href: `#/exam/${e.id}/grades`, html: 'Grades ' + icon('arrow-right') })),
           e.domains.map((d) => { const a = acc[d.id], p = pct(a.correct, a.seen); return h('div', { class: 'ready-row' }, h('div', { class: 'row-between small' }, h('span', { text: d.name }), h('b', { text: a.seen ? p + '%' : '–' })), bar(a.seen ? p : 0, a.seen ? (p >= e.mock.pass ? 'ok' : 'warn') : '')); }),
           h('p', { class: 'muted small', text: 'Accuracy per exam domain across every question you have answered. Aim for 85%+ in each.' }));
       });
@@ -262,7 +269,7 @@
           h('div', { class: 'ch-art', html: courseArt(e, { k: 'h', w: 340, h: 150, tag: 'Course 1 of 5', fs: 46 }) }),
           h('div', { class: 'ch-prog' },
             h('div', { class: 'ring sm', html: KS.ring(cp.pct, 'var(--accent)', 76) + `<div class="rv"><b>${cp.pct}%</b></div>` }),
-            h('div', null, h('b', { text: cp.pct === 100 ? 'Course complete 🎉' : cp.pct ? 'Keep going!' : 'Ready when you are' }), h('div', { class: 'muted small', text: `${cp.done} of ${cp.total} required items done` }))),
+            h('div', null, h('b', { text: cp.pct === 100 ? 'Course complete' : cp.pct ? 'Keep going!' : 'Ready when you are' }), h('div', { class: 'muted small', text: `${cp.done} of ${cp.total} required items done` }))),
           h('a', { class: 'btn primary block', href: rt.href }, cp.done || S().state.lastVisit ? 'Resume learning' : 'Start learning'),
           h('div', { class: 'muted small center', text: 'Next: ' + rt.label }))));
     const tabs = h('nav', { class: 'tabs' }, h('div', { class: 'tabs-inner' }, TABS.map(([k, l]) => h('a', { class: k === tab ? 'on' : '', href: '#/exam/' + e.id + (k ? '/' + k : '') }, l))));
@@ -308,7 +315,7 @@
       const key = 'm' + m.num, collapsed = !!ui.collapsed[key];
       const mins = m.chapters.reduce((a, c) => a + (c.minutes || 25) + 10, 0);
       const body = h('div', { class: 'mod-body' }, m.chapters.map((c) => h('div', { class: 'lesson' },
-        h('div', { class: 'lesson-head' }, h('span', { class: 'lesson-ic', text: c.icon || '📘' }), h('div', null, h('div', { class: 'eyebrow', text: 'Lesson ' + c.num }), h('h4', { text: c.title }), h('p', { class: 'muted small', html: c.subtitle || '' }))),
+        h('div', { class: 'lesson-head' }, h('span', { class: 'lesson-ic', html: icon(c.icon || 'book-open') }), h('div', null, h('div', { class: 'eyebrow', text: 'Lesson ' + c.num }), h('h4', { text: c.title }), h('p', { class: 'muted small', html: c.subtitle || '' }))),
         h('div', { class: 'items' }, chapterItems(e, c).map(itemRow)))));
       const card = h('section', { class: 'module' + (collapsed ? ' collapsed' : ''), id: 'mod-' + m.num },
         h('button', { class: 'mod-head', onclick: () => { ui.collapsed[key] = !ui.collapsed[key]; S().save(); card.classList.toggle('collapsed'); } },
@@ -380,12 +387,12 @@
     };
     coursePage(e, 'notes', h('div', { class: 'narrowish' },
       h('div', { class: 'row-between' }, h('div', null, h('h2', { class: 'sec-title', style: { marginTop: 0 }, text: 'My notes' }), h('p', { class: 'muted', text: 'Notes you take in the lesson player are saved in this browser and collected here.' })),
-        withNotes.length ? h('button', { class: 'btn', onclick: exportMd }, '⬇ Export as Markdown') : null),
+        withNotes.length ? h('button', { class: 'btn', onclick: exportMd }, I('download'), 'Export as Markdown') : null),
       withNotes.length ? withNotes.map((c) => {
         const ta = h('textarea', { class: 'note-ta', rows: 6 }); ta.value = notes[c.id];
         const saved = h('span', { class: 'muted small', text: 'Saved locally' });
         let tmr; ta.addEventListener('input', () => { clearTimeout(tmr); saved.textContent = 'Saving…'; tmr = setTimeout(() => { notes[c.id] = ta.value; S().save(); saved.textContent = 'Saved locally'; }, 400); });
-        return h('section', { class: 'card note-card' }, h('div', { class: 'row-between' }, h('h3', { text: `${c.icon || ''} ${c.num}. ${c.title}` }), h('a', { class: 'btn sm ghost', href: `#/exam/${id}/learn/${c.id}` }, 'Open lesson')), ta, saved);
+        return h('section', { class: 'card note-card' }, h('div', { class: 'row-between' }, h('h3', { text: `${c.num}. ${c.title}` }), h('a', { class: 'btn sm ghost', href: `#/exam/${id}/learn/${c.id}` }, 'Open lesson')), ta, saved);
       }) : h('div', { class: 'card empty' }, h('div', { class: 'big', html: icon('notes') }), h('h3', { text: 'No notes yet' }), h('p', { class: 'muted', text: 'Open any lesson and press the Notes button in the player to start writing.' }), h('a', { class: 'btn primary', href: resumeTarget(e).href }, 'Go to my lesson'))));
   }));
 
@@ -394,7 +401,7 @@
     const intel = e.intel || { sections: [] };
     coursePage(e, 'intel', h('div', { class: 'narrowish guide' },
       intel.intro ? h('p', { class: 'lead', html: intel.intro }) : null,
-      intel.sections.map((s) => h('section', { class: 'card guide-sec' }, h('h2', { html: (s.icon ? s.icon + ' ' : '') + s.title }), KS.renderBlocks(s.blocks, { steppers: [] })))));
+      intel.sections.map((s) => h('section', { class: 'card guide-sec' }, h('h2', { class: 'with-ic', html: (s.icon ? icon(s.icon) : '') + '<span>' + s.title + '</span>' }), KS.renderBlocks(s.blocks, { steppers: [] })))));
   }));
 
   /* ---- Resources ---- */
@@ -410,8 +417,8 @@
       Object.entries(groups).map(([g, list]) => h('section', null, h('h2', { class: 'sec-title', text: g }), h('div', { class: 'grid g3' }, list.map(([it, i]) => {
         const local = it.kind === 'page' || it.kind === 'route';
         return h('a', { class: 'card res-card', href: it.kind === 'route' ? it.url : local ? `#/exam/${id}/lib/${i}` : it.url, target: local ? null : '_blank', rel: local ? null : 'noopener' },
-          h('div', { class: 'res-ic', text: it.icon || '🔗' }), h('h3', { text: it.title }), it.note ? h('p', { class: 'muted small', html: it.note }) : null,
-          h('span', { class: 'tag', text: local ? 'Opens here' : 'External ↗' }));
+          h('div', { class: 'res-ic', html: icon(it.icon || 'link') }), h('h3', { text: it.title }), it.note ? h('p', { class: 'muted small', html: it.note }) : null,
+          h('span', { class: 'tag', html: local ? 'Opens here' : 'External ' + icon('external-link') }));
       })))),
       h('p', { class: 'muted small', html: 'Add your own Claude artifacts: save the HTML into <code>exams/' + id + '/library/</code> and list it in <code>exams/' + id + '/exam.js</code>.' })));
   }));
@@ -432,7 +439,7 @@
     const root = app();
     root.innerHTML = '';
     const sideList = h('div', { class: 'pl-outline' }, modChapters.map((c) => h('div', { class: 'pl-group' + (c === ch ? ' current' : '') },
-      h('div', { class: 'pl-gtitle' }, h('span', { text: c.icon || '📘' }), h('span', { text: `${c.num}. ${c.title}` })),
+      h('div', { class: 'pl-gtitle' }, h('span', { class: 'pl-gic', html: icon(c.icon || 'book-open') }), h('span', { text: `${c.num}. ${c.title}` })),
       chapterItems(e, c).map((it) => h('a', { class: 'pl-item' + (it.ch === ch && it.kind === kind ? ' on' : '') + (it.done ? ' done' : ''), href: it.href },
         statusDot(it), h('span', { class: 'pl-it' }, h('span', { text: it.kind === 'learn' ? 'Slides' : it.type }), h('span', { class: 'muted small', text: it.meta })))))));
     const mp = (() => { const its = modChapters.flatMap((c) => chapterItems(e, c)).filter((x) => x.required); const dn = its.filter((x) => x.done).length; return { dn, n: its.length }; })();
@@ -455,7 +462,7 @@
       h('div', { class: 'row-between' }, h('h3', { html: icon('notes') + ' My notes' }), h('button', { class: 'icon-btn', onclick: () => toggleNotes(), html: icon('close') })),
       h('p', { class: 'muted small', text: `${ch.num}. ${ch.title}` }),
       opts.insertRef ? h('button', { class: 'btn sm ghost', onclick: () => { const r = opts.insertRef(); const pos = ta.selectionStart || ta.value.length; ta.value = ta.value.slice(0, pos) + r + ta.value.slice(pos); ta.dispatchEvent(new Event('input')); ta.focus(); } }, '+ Reference this slide') : null,
-      ta, saved, h('a', { class: 'small', href: `#/exam/${e.id}/notes` }, 'All notes →'));
+      ta, saved, h('a', { class: 'small link-arrow', href: `#/exam/${e.id}/notes`, html: 'All notes ' + icon('arrow-right') }));
     function toggleNotes() { ui.notesOpen = !drawer.classList.contains('open'); drawer.classList.toggle('open', ui.notesOpen); S().save(); }
 
     const main = h('section', { class: 'pl-main' });
@@ -517,7 +524,7 @@
         stage.appendChild(renderSlide(e, c, slides[i], ctx, pl));
         pl.body.scrollTop = 0;
         if (!st.viewed.includes(i)) { st.viewed.push(i); S().touch({ slides: 1 }); }
-        if (i === slides.length - 1 && !st.completed) { st.completed = true; S().event(id, `Completed lesson <b>${KS.esc(c.title)}</b>`, '📘'); }
+        if (i === slides.length - 1 && !st.completed) { st.completed = true; S().event(id, `Completed lesson <b>${KS.esc(c.title)}</b>`, 'book-open'); }
         st.last = i; S().save();
         prog.style.width = ((i + 1) / slides.length) * 100 + '%';
         counter.textContent = `Slide ${i + 1} of ${slides.length}`;
@@ -546,7 +553,7 @@
         h('div', { class: 'cover-art', html: courseArt(e, { k: 'c' + c.num, w: 1100, h: 200, tag: `${e.short} · Lesson ${c.num}`, title: '', fs: 40 }) }),
         h('div', { class: 'cover-body' },
           h('div', { class: 'kicker', style: { color: KS.color(d.color) }, text: `Lesson ${c.num} · ${d.name || ''} · ${d.weight || '?'}% of exam` }),
-          h('h1', null, h('span', { class: 'cover-ic', text: c.icon || '📘' }), c.title),
+          h('h1', null, h('span', { class: 'cover-ic', html: icon(c.icon || 'book-open') }), c.title),
           h('div', { class: 'sub', html: c.subtitle || '' }),
           c.objectives ? h('div', null, h('h3', { text: 'What you’ll learn' }), h('ul', { class: 'objectives' }, c.objectives.map((o) => h('li', null, I('check'), h('span', { html: o }))))) : null,
           h('p', { class: 'muted small', html: `${c.slides.length + 2} slides · ~${c.minutes || Math.round(c.slides.length * 2.5)} min · then a ${(c.quiz || []).length}-question practice quiz. Use <kbd>←</kbd> <kbd>→</kbd> or <kbd>Space</kbd>.` })));
@@ -562,7 +569,7 @@
       s.kicker ? h('div', { class: 'kicker', html: s.kicker }) : null,
       s.title ? h('h2', { class: 'slide-title', html: s.title }) : null,
       KS.renderBlocks(s.blocks, ctx),
-      s.tip ? h('div', { class: 'tip-box', html: '<b>🎯 Exam tip</b> ' + s.tip }) : null);
+      s.tip ? h('div', { class: 'tip-box', html: icon('target') + '<div><b>Exam tip</b> ' + s.tip + '</div>' }) : null);
   }
 
   /* ---- Practice quiz (in player) ---- */
@@ -637,7 +644,7 @@
         btns.forEach((b, k) => { b.disabled = true; const oi = order[k]; if (ans.includes(oi)) b.classList.add('correct'); else if (picked.has(oi)) b.classList.add('wrong'); });
         if (ok) correct++; else missed.push({ q, picked: [...picked] });
         S().recordAnswer(e.id, q.id, ok); S().save();
-        exp.appendChild(h('div', { class: 'explain', html: `<div class="verdict ${ok ? 'ok' : 'bad'}">${ok ? '✓ Correct' : '✗ Incorrect'}</div>${q.explain || ''}${KS.refHtml(q)}` }));
+        exp.appendChild(h('div', { class: 'explain', html: `<div class="verdict ${ok ? 'ok' : 'bad'}">${ok ? icon('circle-check') + ' Correct' : icon('circle-x') + ' Incorrect'}</div>${q.explain || ''}${KS.refHtml(q)}` }));
         checkBtn.style.display = 'none'; nextBtn.style.display = ''; nextBtn.focus();
       }
       const d = e.domainById[q.domain] || {};
@@ -655,8 +662,8 @@
         const was = st.quizBest;
         st.quizBest = Math.max(st.quizBest || 0, score); st.quizAttempts = (st.quizAttempts || 0) + 1;
         st.quizHistory = (st.quizHistory || []).concat({ score, t: Date.now() }).slice(-20);
-        S().event(e.id, `Scored <b>${score}%</b> on the <b>${KS.esc(opts.chapter.title)}</b> quiz` + (pass && !(was >= e.mock.pass) ? ' and passed it' : ''), pass ? '✅' : '📝');
-      } else S().event(e.id, `Scored <b>${score}%</b> on <b>${KS.esc(opts.title)}</b>`, '🎯');
+        S().event(e.id, `Scored <b>${score}%</b> on the <b>${KS.esc(opts.chapter.title)}</b> quiz` + (pass && !(was >= e.mock.pass) ? ' and passed it' : ''), pass ? 'circle-check' : 'clipboard-list');
+      } else S().event(e.id, `Scored <b>${score}%</b> on <b>${KS.esc(opts.title)}</b>`, 'target');
       S().save();
       wrap.appendChild(h('div', { class: 'q-card result-card ' + (pass ? 'pass' : 'fail') },
         h('div', { class: 'result-hero' },
@@ -722,8 +729,8 @@
           h('button', { class: 'btn sm', onclick: () => { onlyUnknown = !onlyUnknown; deck = KS.shuffle(onlyUnknown ? cards.filter((c) => p.flash[c.term] !== 'known') : cards); i = 0; render(); } }, onlyUnknown ? 'Show all' : 'Only unknown'),
           h('button', { class: 'btn sm', onclick: () => { deck = KS.shuffle(deck); i = 0; render(); } }, 'Shuffle'))));
       if (i >= deck.length) {
-        if (chapter && deck.length) { const st = S().chapter(e.id, chapter.id); if (!st.flashDone) { st.flashDone = true; S().event(e.id, `Finished the <b>${KS.esc(chapter.title)}</b> flashcards`, '🃏'); } S().save(); }
-        wrap.appendChild(h('div', { class: 'q-card center' }, h('h2', { text: deck.length ? '🎉 Deck complete' : 'No cards to show' }), h('p', { class: 'muted', text: `${known} of ${cards.length} terms marked as known.` }),
+        if (chapter && deck.length) { const st = S().chapter(e.id, chapter.id); if (!st.flashDone) { st.flashDone = true; S().event(e.id, `Finished the <b>${KS.esc(chapter.title)}</b> flashcards`, 'layers'); } S().save(); }
+        wrap.appendChild(h('div', { class: 'q-card center' }, h('h2', { text: deck.length ? 'Deck complete' : 'No cards to show' }), h('p', { class: 'muted', text: `${known} of ${cards.length} terms marked as known.` }),
           h('div', { class: 'row center' }, h('button', { class: 'btn', onclick: () => { deck = KS.shuffle(cards.filter((c) => p.flash[c.term] !== 'known')); onlyUnknown = true; i = 0; render(); } }, 'Study unknown cards'), nextIt ? h('a', { class: 'btn primary', href: nextIt.href }, 'Go to next item', I('right')) : null)));
         return;
       }
@@ -830,7 +837,7 @@
       const picked = new Set(m.answers[m.cur] || []);
       const answered = Object.keys(m.answers).filter((k) => (m.answers[k] || []).length).length;
       counter.innerHTML = `Question <b>${m.cur + 1}</b> of ${qs.length} · ${answered} answered`;
-      flagBtn.textContent = m.flags[m.cur] ? '🚩 Flagged' : '⚐ Flag';
+      flagBtn.innerHTML = icon('flag') + (m.flags[m.cur] ? ' Flagged' : ' Flag'); flagBtn.classList.toggle('flagged', !!m.flags[m.cur]);
       body.innerHTML = '';
       const btns = order.map((oi, k) => {
         const b = h('button', { class: 'opt' + (multi ? ' multi' : '') + (picked.has(oi) ? ' sel' : ''), html: `<span class="key">${multi ? (picked.has(oi) ? icon('check') : '') : String.fromCharCode(65 + k)}</span><span>${q.options[oi]}</span>` });
@@ -851,7 +858,7 @@
       body.appendChild(h('div', { class: 'card', style: { marginTop: '16px' } }, navGrid()));
     }
     function navGrid() {
-      return h('div', null, h('div', { class: 'row small muted', style: { marginBottom: '10px' }, html: '<span class="tag accent">answered</span><span class="tag warn">● flagged</span><span>Click a number to jump</span>' }),
+      return h('div', null, h('div', { class: 'row small muted', style: { marginBottom: '10px' }, html: '<span class="tag accent">answered</span><span class="tag warn">flagged</span><span>Click a number to jump</span>' }),
         h('div', { class: 'navgrid' }, qs.map((_, i) => h('button', { class: ((m.answers[i] || []).length ? 'ans ' : '') + (m.flags[i] ? 'flag ' : '') + (i === m.cur ? 'cur' : ''), onclick: () => { drawer.classList.remove('open'); go(i); }, text: i + 1 }))));
     }
     function sheet(...kids) {
@@ -884,7 +891,7 @@
       const att = { id: Date.now().toString(36), key: m.key, title: m.title, date: Date.now(), qids: m.qids, orders: m.orders, answers: m.answers, flags: m.flags, correct, total: qs.length, score, pass: score >= e.mock.pass, byDomain, timeUsed: Math.min(m.duration, Math.round((Date.now() - m.start) / 1000)), timeout: !!timeout };
       p.attempts.push(att);
       delete p.activeMock;
-      S().event(e.id, `${att.pass ? 'Passed' : 'Took'} <b>${KS.esc(m.title)}</b> with <b>${score}%</b>`, att.pass ? '🏆' : '⏱️');
+      S().event(e.id, `${att.pass ? 'Passed' : 'Took'} <b>${KS.esc(m.title)}</b> with <b>${score}%</b>`, att.pass ? 'trophy' : 'timer');
       S().save();
       location.hash = `#/exam/${e.id}/results/${att.id}`;
     }
@@ -919,9 +926,9 @@
           h('div', { class: 'ring', html: KS.ring(t.score, t.pass ? 'var(--ok)' : 'var(--bad)', 132) + `<div class="rv"><b>${t.score}%</b><span>${t.correct}/${t.total}</span></div>` }),
           h('div', { style: { flex: 1, minWidth: '240px' } },
             h('div', { class: 'eyebrow', text: t.pass ? 'Passed' : 'Not passed' }),
-            h('h2', { text: t.pass ? 'You would have passed! 🎉' : `Not yet: ${e.mock.pass}% needed` }),
+            h('h2', { text: t.pass ? 'You would have passed' : `Not yet: ${e.mock.pass}% needed` }),
             h('p', { class: 'muted', html: `${new Date(t.date).toLocaleString()} · time used <b>${KS.fmtTime(t.timeUsed)}</b> of ${e.mock.minutes}:00${t.timeout ? ' (time ran out)' : ''}` }),
-            weakest ? h('p', { html: `Weakest domain: <b>${weakest.d.name}</b> (${pct(weakest.r.c, weakest.r.t)}%). <a href="#/exam/${id}/practice/${weakest.d.id}">Drill it →</a>` }) : null,
+            weakest ? h('p', { html: `Weakest domain: <b>${weakest.d.name}</b> (${pct(weakest.r.c, weakest.r.t)}%). <a href="#/exam/${id}/practice/${weakest.d.id}">Drill it</a>` }) : null,
             h('div', { class: 'row' }, h('a', { class: 'btn primary', href: `#/exam/${id}/mock/${t.key}` }, 'Retake'), h('a', { class: 'btn', href: `#/exam/${id}/drill` }, 'Weak-area drill'), h('a', { class: 'btn ghost', href: '#/exam/' + id }, 'Course home')))),
         h('h3', { style: { marginTop: '22px' }, text: 'Score by domain' }),
         e.domains.map((d) => { const r = t.byDomain[d.id] || { c: 0, t: 0 }; const v = pct(r.c, r.t); return h('div', { class: 'dom-row' }, h('span', { html: `<i class="dotc" style="background:${KS.color(d.color)}"></i>${d.name} <span class="muted small">${d.weight}%</span>` }), bar(v, v >= e.mock.pass ? 'ok' : 'bad'), h('b', { text: `${r.c}/${r.t}` })); }),
@@ -939,7 +946,7 @@
       e.domains.map((d) => h('section', null,
         h('h2', { class: 'sec-title', html: `<i class="dotc" style="background:${KS.color(d.color)}"></i> ${d.name} <span class="muted small">${d.weight}%</span>` }),
         h('div', { class: 'grid g2' }, e.chapterList.filter((c) => c.domain === d.id).map((c) => h('div', { class: 'card' },
-          h('h3', { text: `${c.icon || ''} ${c.num}. ${c.title}` }),
+          h('h3', { text: `${c.num}. ${c.title}` }),
           h('ul', { class: 'small cs-list' }, (c.summary || []).map((x) => h('li', { html: x }))),
           (c.glossary || []).length ? h('details', null, h('summary', { class: 'small', text: `${c.glossary.length} key terms` }),
             h('dl', { class: 'small' }, c.glossary.map((g) => [h('dt', { html: g.term }), h('dd', { html: g.def })]))) : null)))))), { nav: 'kcna' });
@@ -948,7 +955,7 @@
   KS.route('/exam/:id/lib/:i', ({ id, i }) => getExam(id).then((e) => {
     const it = (e.library || [])[parseInt(i, 10)];
     if (!it) throw new Error('Library item not found');
-    shell(h('main', { class: 'page wide' }, h('div', { class: 'row-between' }, h('div', { class: 'crumbs', html: `<a href="#/exam/${id}/library">Resources</a> <span>›</span> ${KS.esc(it.title)}` }), h('a', { class: 'btn sm', href: `exams/${id}/${it.url}`, target: '_blank' }, 'Open in new tab ↗')),
+    shell(h('main', { class: 'page wide' }, h('div', { class: 'row-between' }, h('div', { class: 'crumbs', html: `<a href="#/exam/${id}/library">Resources</a> <span>›</span> ${KS.esc(it.title)}` }), h('a', { class: 'btn sm', href: `exams/${id}/${it.url}`, target: '_blank' }, 'Open in new tab', I('external-link'))),
       h('iframe', { class: 'lib-frame', src: `exams/${id}/${it.url}`, title: it.title })), { noFooter: true, nav: 'kcna' });
   }));
 
@@ -969,8 +976,8 @@
         h('div', null, h('b', { text: S().streak() }), h('span', { text: 'current streak' })),
         h('div', null, h('b', { text: (size / 1024).toFixed(1) + ' KB' }), h('span', { text: 'stored locally' }))),
       h('div', { class: 'row', style: { margin: '18px 0' } },
-        h('button', { class: 'btn primary', onclick: () => { const a = h('a', { href: URL.createObjectURL(new Blob([S().exportJSON()], { type: 'application/json' })), download: 'kubestronaut-progress.json' }); a.click(); } }, '⬇ Download backup'),
-        h('button', { class: 'btn', onclick: () => file.click() }, '⬆ Restore from file'), file,
+        h('button', { class: 'btn primary', onclick: () => { const a = h('a', { href: URL.createObjectURL(new Blob([S().exportJSON()], { type: 'application/json' })), download: 'kubestronaut-progress.json' }); a.click(); } }, I('download'), 'Download backup'),
+        h('button', { class: 'btn', onclick: () => file.click() }, I('upload'), 'Restore from file'), file,
         h('button', { class: 'btn danger', onclick: () => { if (confirm('Erase ALL progress, notes and streaks in this browser?')) { S().reset(); KS.toast('Progress reset'); KS.dispatch(); } } }, 'Reset everything')),
       h('details', null, h('summary', { text: 'Raw data' }), ta)), { nav: '' });
   });

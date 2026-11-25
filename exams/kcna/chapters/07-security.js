@@ -2,7 +2,7 @@ KS.registerChapter('kcna', {
   id: 'security',
   title: 'Security',
   subtitle: 'The 4Cs, authentication, RBAC, admission, Pod Security, Secrets, supply chain and runtime defence',
-  icon: '🔐',
+  icon: 'lock-keyhole',
   minutes: 35,
   objectives: [
     'Describe the 4Cs of cloud native security and where each control belongs',
@@ -44,11 +44,11 @@ KS.registerChapter('kcna', {
       title: 'Who are you? Users, groups and ServiceAccounts',
       blocks: [
         { type: 'flip', items: [
-          { front: '🙅 No User object', back: 'Kubernetes has no User or Group resource. Human identities come from <b>outside</b>: certificates, an OIDC identity provider, webhooks. The API server only sees a username and groups.' },
-          { front: '📜 X.509 client certs', back: 'The certificate’s <b>CN</b> becomes the username and <b>O</b> fields become groups. Common for admins (kubeconfig). Hard to revoke, so keep them short-lived.' },
-          { front: '🔑 OIDC tokens', back: 'Single sign-on through an identity provider (e.g. Dex, Keycloak, cloud IdPs). The API server validates the signed ID token and reads user and group claims.' },
-          { front: '🤖 ServiceAccount', back: 'A namespaced API object: the identity for <b>workloads</b>. Username format: <code>system:serviceaccount:&lt;ns&gt;:&lt;name&gt;</code>. Each namespace gets a <code>default</code> ServiceAccount.' },
-          { front: '🎫 Projected tokens', back: 'Pods get short-lived, audience-bound tokens from the <b>TokenRequest API</b>, mounted as a projected volume and rotated by the kubelet. Long-lived Secret-based tokens are no longer auto-created.' },
+          { front: 'No User object', back: 'Kubernetes has no User or Group resource. Human identities come from <b>outside</b>: certificates, an OIDC identity provider, webhooks. The API server only sees a username and groups.' },
+          { front: 'X.509 client certs', back: 'The certificate’s <b>CN</b> becomes the username and <b>O</b> fields become groups. Common for admins (kubeconfig). Hard to revoke, so keep them short-lived.' },
+          { front: 'OIDC tokens', back: 'Single sign-on through an identity provider (e.g. Dex, Keycloak, cloud IdPs). The API server validates the signed ID token and reads user and group claims.' },
+          { front: 'ServiceAccount', back: 'A namespaced API object: the identity for <b>workloads</b>. Username format: <code>system:serviceaccount:&lt;ns&gt;:&lt;name&gt;</code>. Each namespace gets a <code>default</code> ServiceAccount.' },
+          { front: 'Projected tokens', back: 'Pods get short-lived, audience-bound tokens from the <b>TokenRequest API</b>, mounted as a projected volume and rotated by the kubelet. Long-lived Secret-based tokens are no longer auto-created.' },
         ] },
         { type: 'code', lang: 'bash', title: 'ServiceAccount basics', code: `
 kubectl create serviceaccount ci-bot -n shop
@@ -63,11 +63,11 @@ kubectl get pod web -o jsonpath='{.spec.serviceAccountName}'`, notes: { 1: 'Serv
       title: 'How RBAC connects subjects to permissions',
       blocks: [
         { type: 'diagram', width: 900, height: 430,
-          caption: 'Subjects are bound to roles; roles list verbs on resources. Press ▶ Play to evaluate requests.',
+          caption: 'Subjects are bound to roles; roles list verbs on resources. Press Play to evaluate requests.',
           nodes: [
-            { id: 'jane', x: 30, y: 40, w: 160, h: 56, label: 'User: jane', icon: '👩‍💻', sub: 'from cert / OIDC', color: 'gray', info: 'A human identity asserted by an authenticator. Not a Kubernetes object: RBAC only references the name string.' },
+            { id: 'jane', x: 30, y: 40, w: 160, h: 56, label: 'User: jane', icon: 'user-round', sub: 'from cert / OIDC', color: 'gray', info: 'A human identity asserted by an authenticator. Not a Kubernetes object: RBAC only references the name string.' },
             { id: 'sa', x: 30, y: 175, w: 160, h: 56, label: 'ServiceAccount', sub: 'shop:ci-bot', color: 'blue', info: 'Workload identity <code>system:serviceaccount:shop:ci-bot</code>. Used by Pods and CI jobs that call the API.' },
-            { id: 'grp', x: 30, y: 315, w: 160, h: 56, label: 'Group: sre', icon: '👥', sub: 'from cert O / OIDC', color: 'gray', info: 'Groups come from the authenticator too. Binding to a group grants every member the role.' },
+            { id: 'grp', x: 30, y: 315, w: 160, h: 56, label: 'Group: sre', icon: 'users', sub: 'from cert O / OIDC', color: 'gray', info: 'Groups come from the authenticator too. Binding to a group grants every member the role.' },
             { id: 'rb', x: 260, y: 60, w: 180, h: 56, label: 'RoleBinding', sub: 'read-pods · ns shop', color: 'purple', info: 'Namespaced. Grants the referenced role’s permissions <b>only inside namespace shop</b> to its subjects.' },
             { id: 'rb2', x: 260, y: 195, w: 180, h: 56, label: 'RoleBinding', sub: 'ci-view · ns shop', color: 'purple', info: 'A RoleBinding may reference a <b>ClusterRole</b>. The permissions are then limited to the binding’s namespace: a handy way to reuse one role definition across namespaces.' },
             { id: 'crb', x: 260, y: 330, w: 180, h: 56, label: 'ClusterRole-\nBinding', sub: 'sre-view', color: 'red', fs: 12.5, info: 'Cluster-wide. Grants the ClusterRole in <b>every</b> namespace (and for cluster-scoped resources). Use sparingly.' },
@@ -173,15 +173,15 @@ roleRef:
       title: 'Admission control and policy engines',
       blocks: [
         { type: 'flow', items: [
-          { icon: '🪪', label: 'Authenticated', sub: 'identity known', info: 'The request has passed authentication.' },
-          { icon: '🛂', label: 'Authorized', sub: 'RBAC said yes', info: 'RBAC only answers “may this user do this verb on this resource?”. It cannot inspect the object’s contents.' },
-          { icon: '🧪', label: 'Mutating admission', sub: 'may change the object', info: 'Built-in plugins and mutating webhooks set defaults, inject sidecars, add labels.' },
-          { icon: '✅', label: 'Validating admission', sub: 'accept or reject', info: 'Pod Security Admission, ResourceQuota, ValidatingAdmissionPolicy (CEL) and validating webhooks such as Gatekeeper and Kyverno.' },
-          { icon: '🗄️', label: 'Stored in etcd', sub: 'object accepted', info: 'Only objects that pass every admission check are persisted.' },
+          { icon: 'id-card', label: 'Authenticated', sub: 'identity known', info: 'The request has passed authentication.' },
+          { icon: 'badge-check', label: 'Authorized', sub: 'RBAC said yes', info: 'RBAC only answers “may this user do this verb on this resource?”. It cannot inspect the object’s contents.' },
+          { icon: 'flask-conical', label: 'Mutating admission', sub: 'may change the object', info: 'Built-in plugins and mutating webhooks set defaults, inject sidecars, add labels.' },
+          { icon: 'circle-check', label: 'Validating admission', sub: 'accept or reject', info: 'Pod Security Admission, ResourceQuota, ValidatingAdmissionPolicy (CEL) and validating webhooks such as Gatekeeper and Kyverno.' },
+          { icon: 'database', label: 'Stored in etcd', sub: 'object accepted', info: 'Only objects that pass every admission check are persisted.' },
         ], caption: 'Admission checks <b>what</b> you create, after RBAC checks <b>whether</b> you may create it.' },
         { type: 'cards', cols: 2, items: [
-          { icon: '⚖️', color: 'purple', title: 'OPA Gatekeeper', text: 'Admission controller built on Open Policy Agent (a CNCF graduated project). Policies are written in <b>Rego</b> as ConstraintTemplates and Constraints. Can audit existing objects.' },
-          { icon: '🛡️', color: 'teal', title: 'Kyverno', text: 'Kubernetes-native policy engine: policies are written as <b>YAML</b> resources. Can validate, <b>mutate</b>, generate resources and verify image signatures.' },
+          { icon: 'scale', color: 'purple', title: 'OPA Gatekeeper', text: 'Admission controller built on Open Policy Agent (a CNCF graduated project). Policies are written in <b>Rego</b> as ConstraintTemplates and Constraints. Can audit existing objects.' },
+          { icon: 'shield', color: 'teal', title: 'Kyverno', text: 'Kubernetes-native policy engine: policies are written as <b>YAML</b> resources. Can validate, <b>mutate</b>, generate resources and verify image signatures.' },
         ] },
         { type: 'callout', kind: 'tip', title: 'Typical policies', html: 'Require labels, block <code>:latest</code> tags, allow images only from a trusted registry, require resource limits, require signed images.' },
       ],
@@ -278,9 +278,9 @@ kubectl get secret db -n shop -o jsonpath='{.data.password}'
 echo 'UzNjcjN0' | base64 -d
 # S3cr3t`, notes: { 1: 'Creates an Opaque Secret. Types also include <code>kubernetes.io/tls</code> and <code>kubernetes.io/dockerconfigjson</code>.', 2: 'The <code>data</code> field holds values <b>base64-encoded</b>.', 4: 'Base64 is an encoding, not encryption: one command reverses it.' } },
         { type: 'cards', cols: 3, items: [
-          { icon: '🗄️', color: 'amber', title: 'Encryption at rest', text: 'By default Secrets are stored in etcd unencrypted. Configure the API server with an <b>EncryptionConfiguration</b> (aescbc, aesgcm, secretbox or a <b>KMS</b> provider).' },
-          { icon: '🔏', color: 'purple', title: 'Lock down access', text: 'RBAC: restrict <code>get</code>/<code>list</code>/<code>watch</code> on Secrets. Anyone who can create Pods in a namespace can mount its Secrets too.' },
-          { icon: '🏦', color: 'teal', title: 'External managers', text: 'Keep the source of truth in HashiCorp Vault or a cloud secret manager and sync with the External Secrets Operator or the Secrets Store CSI Driver.' },
+          { icon: 'database', color: 'amber', title: 'Encryption at rest', text: 'By default Secrets are stored in etcd unencrypted. Configure the API server with an <b>EncryptionConfiguration</b> (aescbc, aesgcm, secretbox or a <b>KMS</b> provider).' },
+          { icon: 'file-lock', color: 'purple', title: 'Lock down access', text: 'RBAC: restrict <code>get</code>/<code>list</code>/<code>watch</code> on Secrets. Anyone who can create Pods in a namespace can mount its Secrets too.' },
+          { icon: 'landmark', color: 'teal', title: 'External managers', text: 'Keep the source of truth in HashiCorp Vault or a cloud secret manager and sync with the External Secrets Operator or the Secrets Store CSI Driver.' },
         ] },
         { type: 'callout', kind: 'warn', title: 'Git is not a vault', html: 'Never commit plain Secret manifests to Git. For GitOps use encrypted forms (Sealed Secrets, SOPS) or reference an external secret manager.' },
       ],
@@ -293,9 +293,9 @@ echo 'UzNjcjN0' | base64 -d
       blocks: [
         { type: 'text', html: '<b>Zero trust</b> means no traffic is trusted just because it originates inside the cluster. Every connection should be explicitly allowed and, ideally, authenticated.' },
         { type: 'cards', cols: 3, items: [
-          { icon: '🧱', color: 'blue', title: 'NetworkPolicy', text: 'Start with <b>default-deny</b> per namespace, then allow only required flows. Enforced by the CNI (Calico, Cilium).' },
-          { icon: '🔒', color: 'green', title: 'mTLS', text: 'A service mesh (Istio, Linkerd) encrypts and authenticates every service-to-service call with workload identities.' },
-          { icon: '🚪', color: 'amber', title: 'Protect the API server', text: 'Restrict who can reach the control plane endpoint, keep anonymous auth off, use TLS everywhere, never expose etcd.' },
+          { icon: 'blocks', color: 'blue', title: 'NetworkPolicy', text: 'Start with <b>default-deny</b> per namespace, then allow only required flows. Enforced by the CNI (Calico, Cilium).' },
+          { icon: 'lock', color: 'green', title: 'mTLS', text: 'A service mesh (Istio, Linkerd) encrypts and authenticates every service-to-service call with workload identities.' },
+          { icon: 'door-open', color: 'amber', title: 'Protect the API server', text: 'Restrict who can reach the control plane endpoint, keep anonymous auth off, use TLS everywhere, never expose etcd.' },
         ] },
         { type: 'check', q: 'A security team wants Pods in namespace <code>payments</code> to accept connections only from Pods in namespace <code>checkout</code>. Which resource should they use?', options: ['A RoleBinding in payments', 'A NetworkPolicy with a namespaceSelector', 'A Pod Security Admission label on payments', 'A ClusterRole that denies other namespaces'], answer: 1, explain: '<b>NetworkPolicy</b> controls network traffic; a <code>namespaceSelector</code> in an ingress rule allows only Pods from matching namespaces. RBAC governs API access, not packets, and has no deny rules. Pod Security Admission checks Pod specs, not traffic.', ref: 'https://kubernetes.io/docs/concepts/services-networking/network-policies/' },
       ],
@@ -307,11 +307,11 @@ echo 'UzNjcjN0' | base64 -d
       title: 'Securing what you deploy',
       blocks: [
         { type: 'flow', items: [
-          { icon: '📦', label: 'Build', sub: 'minimal base image', info: 'Use small or distroless base images, pin dependencies, build in CI rather than on laptops.' },
-          { icon: '📋', label: 'SBOM', sub: 'list every component', info: 'A <b>Software Bill of Materials</b> (SPDX or CycloneDX format) lists every package in the image, so you can tell quickly whether a new CVE affects you.' },
-          { icon: '🔍', label: 'Scan', sub: 'find known CVEs', info: 'Image scanners such as Trivy or Grype check packages against vulnerability databases in CI and in the registry.' },
-          { icon: '✍️', label: 'Sign', sub: 'Sigstore cosign', info: '<b>cosign</b> (part of <b>Sigstore</b>) signs images and attaches attestations (SBOM, provenance). Keyless signing uses short-lived certificates and a public transparency log (Rekor).' },
-          { icon: '🛂', label: 'Verify at admission', sub: 'only trusted images run', info: 'An admission policy (Kyverno, Gatekeeper with a verification provider, Sigstore policy-controller) rejects images that are unsigned or from untrusted registries.' },
+          { icon: 'package', label: 'Build', sub: 'minimal base image', info: 'Use small or distroless base images, pin dependencies, build in CI rather than on laptops.' },
+          { icon: 'clipboard-list', label: 'SBOM', sub: 'list every component', info: 'A <b>Software Bill of Materials</b> (SPDX or CycloneDX format) lists every package in the image, so you can tell quickly whether a new CVE affects you.' },
+          { icon: 'search', label: 'Scan', sub: 'find known CVEs', info: 'Image scanners such as Trivy or Grype check packages against vulnerability databases in CI and in the registry.' },
+          { icon: 'pen-line', label: 'Sign', sub: 'Sigstore cosign', info: '<b>cosign</b> (part of <b>Sigstore</b>) signs images and attaches attestations (SBOM, provenance). Keyless signing uses short-lived certificates and a public transparency log (Rekor).' },
+          { icon: 'badge-check', label: 'Verify at admission', sub: 'only trusted images run', info: 'An admission policy (Kyverno, Gatekeeper with a verification provider, Sigstore policy-controller) rejects images that are unsigned or from untrusted registries.' },
         ] },
         { type: 'callout', kind: 'tip', title: 'Pin by digest', html: 'A tag like <code>:1.4.2</code> can be moved to a different image; a digest like <code>@sha256:…</code> cannot. Signatures are tied to digests.' },
       ],
@@ -325,7 +325,7 @@ echo 'UzNjcjN0' | base64 -d
         { type: 'cols', cols: [
           [
             { type: 'cards', cols: 1, items: [
-              { icon: '🦅', color: 'red', title: 'Falco (runtime security)', text: 'CNCF graduated project that watches kernel <b>syscalls</b> (via eBPF) and raises alerts on suspicious behaviour: a shell spawned in a container, writes to <code>/etc</code>, unexpected network connections, reading sensitive files.' },
+              { icon: 'bird', color: 'red', title: 'Falco (runtime security)', text: 'CNCF graduated project that watches kernel <b>syscalls</b> (via eBPF) and raises alerts on suspicious behaviour: a shell spawned in a container, writes to <code>/etc</code>, unexpected network connections, reading sensitive files.' },
             ] },
             { type: 'callout', kind: 'info', title: 'Detect vs prevent', html: 'Falco <b>detects</b> and alerts at runtime. Admission control and Pod Security <b>prevent</b> bad objects from being created in the first place.' },
           ],

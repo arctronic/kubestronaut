@@ -8,18 +8,18 @@ body{background:var(--bg);color:var(--text);font:16px/1.6 system-ui,sans-serif;m
 code,pre{background:var(--code);border:1px solid var(--line);border-radius:8px;font-family:ui-monospace,monospace;font-size:.88em}
 code{padding:1px 6px}pre{padding:12px;overflow-x:auto}h1{margin-top:0}.muted{color:var(--muted)}li{margin:6px 0}
 </style></head><body>
-<h1>🧩 Keep your Claude artifacts here</h1>
+<h1>Keep your Claude artifacts here</h1>
 <p class="muted">Anything Claude builds for you (an interactive explainer, a diagram, a custom quiz) can live in this library next to the slides.</p>
 <h2>Option 1: save the HTML file</h2>
 <ol>
 <li>Save the artifact as an <code>.html</code> file into <code>exams/kcna/library/</code>, e.g. <code>service-types.html</code>.</li>
 <li>Add an entry to the <code>library</code> list in <code>exams/kcna/exam.js</code>:
-<pre>{ group: 'My artifacts', icon: '🧩', kind: 'page',
+<pre>{ group: 'My artifacts', icon: 'puzzle', kind: 'page',
   title: 'Service types explained', url: 'library/service-types.html' }</pre></li>
 <li>Commit and push. It opens inside the hub (and in a new tab).</li>
 </ol>
 <h2>Option 2: link a published artifact</h2>
-<pre>{ group: 'My artifacts', icon: '🔗', title: 'Scheduling visualiser',
+<pre>{ group: 'My artifacts', icon: 'link', title: 'Scheduling visualiser',
   url: 'https://claude.ai/…' }</pre>
 <h2>Option 3: turn it into a chapter</h2>
 <p>Ask Claude to “add slides / questions to the KCNA <i>&lt;chapter&gt;</i> chapter following CONTENT_GUIDE.md”, then run <code>node tools/validate.js kcna</code>.</p>

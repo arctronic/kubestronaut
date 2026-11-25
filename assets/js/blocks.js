@@ -43,7 +43,7 @@
     const cols = b.cols || Math.min((b.items || []).length, 4) || 3;
     const g = h('div', { class: 'b-cards', style: { gridTemplateColumns: `repeat(auto-fit, minmax(${cols >= 4 ? 180 : 220}px, 1fr))` } });
     (b.items || []).forEach((it) => g.appendChild(h('div', { class: 'b-card', style: { '--cc': KS.color(it.color) } },
-      it.icon ? h('div', { class: 'ic', text: it.icon }) : null,
+      it.icon ? h('div', { class: 'ic', html: KS.icon(it.icon) }) : null,
       h('h4', { html: it.title }),
       it.text ? h('p', { html: it.text }) : null)));
     return g;
@@ -130,11 +130,12 @@
       }
       lnEls.push(el); pre.appendChild(el);
     });
-    const head = h('div', { class: 'code-head' }, h('span', { text: b.title || lang }), n ? h('span', { text: 'click highlighted lines ◀' }) : h('span'));
+    const head = h('div', { class: 'code-head' }, h('span', { text: b.title || lang }), n ? h('span', { text: 'Click a highlighted line for its note' }) : h('span'));
     return h('div', { class: 'b-code' }, head, pre, noteBox);
   };
 
-  R.callout = (b) => h('div', { class: 'b-callout ' + (b.kind || 'info') }, b.title ? h('span', { class: 'ct', html: b.title }) : null, h('div', { html: b.html || KS.esc(b.text) }));
+  const CALLOUT_ICON = { tip: 'lightbulb', warn: 'triangle-alert', trap: 'ban', info: 'info', exam: 'target' };
+  R.callout = (b) => h('div', { class: 'b-callout ' + (b.kind || 'info') }, h('span', { class: 'co-ic', html: KS.icon(CALLOUT_ICON[b.kind] || 'info') }), b.title ? h('span', { class: 'ct', html: b.title }) : null, h('div', { html: b.html || KS.esc(b.text) }));
 
   /* ---------- interactive diagram ---------- */
   const SVGNS = 'http://www.w3.org/2000/svg';
@@ -205,7 +206,7 @@
       edgeLayer.appendChild(g);
       edgeEls[e.from + '>' + e.to] = g;
     });
-    const info = h('div', { class: 'dg-info', html: b.intro || '👆 <b>Click any component</b> to learn what it does.' });
+    const info = h('div', { class: 'dg-info', html: b.intro || KS.icon('mouse-pointer-click') + ' <b>Click any component</b> to learn what it does.' });
     const nodeEls = {};
     (b.nodes || []).forEach((n) => {
       const nc = KS.color(n.color || 'blue');
@@ -213,16 +214,25 @@
       g.appendChild(s('rect', { x: n.x, y: n.y, width: n.w, height: n.h, rx: n.round ? n.h / 2 : 11, fill: `color-mix(in srgb, ${nc} 16%, var(--panel))`, stroke: nc, 'stroke-width': 1.6 }));
       const lines = String(n.label || '').split('\n');
       const hasSub = !!n.sub;
-      const icon = n.icon ? n.icon + ' ' : '';
       const total = lines.length + (hasSub ? 1 : 0);
       const lh = 16;
       let y0 = n.y + n.h / 2 - ((total - 1) * lh) / 2 + 5;
-      lines.forEach((ln, i) => g.appendChild(s('text', { x: n.x + n.w / 2, y: y0 + i * lh, 'text-anchor': 'middle', 'font-size': n.fs || 14, 'font-weight': 700 }, (i === 0 ? icon : '') + ln)));
+      const fs = n.fs || 14;
+      // optional Lucide icon drawn to the left of the first label line
+      const iw = n.icon ? 18 : 0;
+      const tx = n.x + n.w / 2 + iw / 2;
+      if (n.icon) {
+        const w0 = lines[0].length * fs * 0.56;
+        const ic = s('svg', { x: tx - w0 / 2 - iw - 2, y: y0 - fs + 1, width: 15, height: 15, viewBox: '0 0 24 24', fill: 'none', stroke: nc, 'stroke-width': 2.2, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', class: 'dg-icon' });
+        ic.innerHTML = KS.iconInner(n.icon);
+        g.appendChild(ic);
+      }
+      lines.forEach((ln, i) => g.appendChild(s('text', { x: i === 0 ? tx : n.x + n.w / 2, y: y0 + i * lh, 'text-anchor': 'middle', 'font-size': fs, 'font-weight': 700 }, ln)));
       if (hasSub) g.appendChild(s('text', { class: 'sub', x: n.x + n.w / 2, y: y0 + lines.length * lh, 'text-anchor': 'middle', 'font-size': 11.5 }, n.sub));
       const show = () => {
         Object.values(nodeEls).forEach((x) => x.classList.remove('sel'));
         g.classList.add('sel');
-        info.innerHTML = '<b>' + KS.esc((n.icon ? n.icon + ' ' : '') + String(n.label).replace(/\n/g, ' ')) + '</b>: ' + (n.info || n.sub || '');
+        info.innerHTML = (n.icon ? KS.icon(n.icon) + ' ' : '') + '<b>' + KS.esc(String(n.label).replace(/\n/g, ' ')) + '</b>: ' + (n.info || n.sub || '');
       };
       g.addEventListener('click', show);
       g.addEventListener('keydown', (e) => { if (e.key === 'Enter') show(); });
@@ -232,24 +242,24 @@
     const parts = [h('div', { class: 'b-diagram' }, svg)];
     if (b.steps && b.steps.length) {
       let cur = -1;
-      const txt = h('div', { class: 'stxt', html: b.stepsIntro || '▶ Press <b>Play</b> or <b>Next step</b> to walk through the flow.' });
+      const txt = h('div', { class: 'stxt', html: b.stepsIntro || 'Press <b>Play</b> or <b>Next step</b> to walk through the flow.' });
       const apply = () => {
         const st = b.steps[cur];
         const on = new Set(st ? st.on || [] : []);
         Object.entries(nodeEls).forEach(([id, el]) => el.classList.toggle('dg-dim', !!st && !on.has(id)));
         Object.entries(edgeEls).forEach(([id, el]) => { el.classList.toggle('dg-dim', !!st && !on.has(id)); el.classList.toggle('flow', !!st && on.has(id)); });
-        txt.innerHTML = st ? `<b>Step ${cur + 1}/${b.steps.length}:</b> ${st.text}` : (b.stepsIntro || '▶ Press <b>Play</b> or <b>Next step</b> to walk through the flow.');
+        txt.innerHTML = st ? `<b>Step ${cur + 1}/${b.steps.length}:</b> ${st.text}` : (b.stepsIntro || 'Press <b>Play</b> or <b>Next step</b> to walk through the flow.');
       };
       let timer = null;
-      const stop = () => { if (timer) { clearInterval(timer); timer = null; playBtn.textContent = '▶ Play'; } };
-      const prev = h('button', { class: 'btn sm', onclick: () => { stop(); cur = Math.max(-1, cur - 1); apply(); } }, '◀');
-      const next = h('button', { class: 'btn sm primary', onclick: () => { stop(); cur = Math.min(b.steps.length - 1, cur + 1); apply(); } }, 'Next step ▶');
+      const stop = () => { if (timer) { clearInterval(timer); timer = null; playBtn.innerHTML = KS.icon('play') + ' Play'; } };
+      const prev = h('button', { class: 'btn sm icon-only', onclick: () => { stop(); cur = Math.max(-1, cur - 1); apply(); }, html: KS.icon('chevron-left'), title: 'Previous step' });
+      const next = h('button', { class: 'btn sm primary', onclick: () => { stop(); cur = Math.min(b.steps.length - 1, cur + 1); apply(); }, html: 'Next step ' + KS.icon('chevron-right') });
       const playBtn = h('button', { class: 'btn sm', onclick: () => {
         if (timer) return stop();
-        cur = -1; apply(); playBtn.textContent = '⏸ Pause';
+        cur = -1; apply(); playBtn.innerHTML = KS.icon('pause') + ' Pause';
         timer = setInterval(() => { if (cur >= b.steps.length - 1) { stop(); return; } cur++; apply(); }, b.interval || 2600);
-      } }, '▶ Play');
-      const reset = h('button', { class: 'btn sm ghost', onclick: () => { stop(); cur = -1; apply(); } }, '↺');
+      }, html: KS.icon('play') + ' Play' });
+      const reset = h('button', { class: 'btn sm ghost', onclick: () => { stop(); cur = -1; apply(); }, html: KS.icon('rotate-ccw'), title: 'Reset' });
       KS.onLeave(stop);
       parts.push(h('div', { class: 'dg-steps' }, prev, txt, next, playBtn, reset));
     }
@@ -263,8 +273,8 @@
     const box = h('div', { class: 'b-flow' });
     const steps = [];
     (b.items || []).forEach((it, i) => {
-      if (i) box.appendChild(h('div', { class: 'farrow', text: '➜' }));
-      const el = h('div', { class: 'fstep' }, it.icon ? h('div', { class: 'ic', text: it.icon }) : null, h('b', { html: it.label }), it.sub ? h('span', { html: it.sub }) : null);
+      if (i) box.appendChild(h('div', { class: 'farrow', html: KS.icon('chevron-right') }));
+      const el = h('div', { class: 'fstep' }, it.icon ? h('div', { class: 'ic', html: KS.icon(it.icon) }) : null, h('b', { html: it.label }), it.sub ? h('span', { html: it.sub }) : null);
       steps.push(el); box.appendChild(el);
     });
     let cur = -1;
@@ -277,8 +287,8 @@
     };
     steps.forEach((el, i) => el.addEventListener('click', () => { cur = i; apply(); }));
     const ctl = h('div', { class: 'flow-ctl' },
-      h('button', { class: 'btn sm', onclick: () => { cur = Math.max(-1, cur - 1); apply(); } }, '◀ Back'),
-      h('button', { class: 'btn sm primary', onclick: () => { cur = cur >= steps.length - 1 ? -1 : cur + 1; apply(); } }, 'Step ▶'));
+      h('button', { class: 'btn sm', onclick: () => { cur = Math.max(-1, cur - 1); apply(); }, html: KS.icon('chevron-left') + ' Back' }),
+      h('button', { class: 'btn sm primary', onclick: () => { cur = cur >= steps.length - 1 ? -1 : cur + 1; apply(); }, html: 'Step ' + KS.icon('chevron-right') }));
     return h('div', null, box, ctl, desc, b.caption ? h('div', { class: 'caption', html: b.caption }) : null);
   };
 
@@ -314,7 +324,7 @@
       bt.addEventListener('click', () => {
         btns.forEach((x, j) => { x.disabled = true; if (j === b.answer) x.classList.add('correct'); else if (j === i) x.classList.add('wrong'); });
         const ok = i === b.answer;
-        exp.innerHTML = `<div class="verdict ${ok ? 'ok' : 'bad'}">${ok ? '✓ Correct' : '✗ Not quite'}</div>${b.explain || ''}${KS.refHtml(b)}`;
+        exp.innerHTML = `<div class="verdict ${ok ? 'ok' : 'bad'}">${ok ? KS.icon('circle-check') + ' Correct' : KS.icon('circle-x') + ' Not quite'}</div>${b.explain || ''}${KS.refHtml(b)}`;
         exp.style.display = 'block';
       });
       opts.appendChild(bt);
@@ -344,7 +354,7 @@
         if (!selL || bt.classList.contains('done')) return;
         if (selL.dataset.i === bt.dataset.i) {
           selL.classList.remove('sel'); selL.classList.add('done'); bt.classList.add('done'); selL = null; done++;
-          status.textContent = done === pairs.length ? '🎉 All matched!' : `Matched ${done}/${pairs.length}`;
+          status.textContent = done === pairs.length ? 'All matched. Nice work.' : `Matched ${done}/${pairs.length}`;
         } else { bt.classList.add('wrong'); setTimeout(() => bt.classList.remove('wrong'), 400); }
       });
     });

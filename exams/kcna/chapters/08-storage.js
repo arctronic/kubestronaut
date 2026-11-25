@@ -2,7 +2,7 @@ KS.registerChapter('kcna', {
   id: 'storage',
   title: 'Storage',
   subtitle: 'Volumes, PersistentVolumes, StorageClasses and CSI: how data outlives a Pod',
-  icon: '💾',
+  icon: 'save',
   minutes: 30,
   objectives: [
     'Tell ephemeral volumes (emptyDir, configMap, secret, downwardAPI) apart from persistent storage',
@@ -18,9 +18,9 @@ KS.registerChapter('kcna', {
       blocks: [
         { type: 'text', html: 'A container’s writable layer lives only as long as that container. When it crashes and the kubelet restarts it, files written inside are <b>gone</b>. Kubernetes solves this with <b>volumes</b>: directories mounted into containers whose lifetime is decoupled from the container, and sometimes from the Pod as well.' },
         { type: 'cards', items: [
-          { icon: '📄', color: 'gray', title: 'Container filesystem', text: 'Lost on every container restart. Never store data you need here.' },
-          { icon: '⏳', color: 'amber', title: 'Ephemeral volume', text: 'Survives container restarts, deleted together with the Pod. emptyDir, configMap, secret, downwardAPI, projected.' },
-          { icon: '🗄️', color: 'green', title: 'Persistent volume', text: 'Lives independently of any Pod. Requested through a PersistentVolumeClaim and backed by real storage (cloud disk, NFS, Ceph…).' },
+          { icon: 'file-text', color: 'gray', title: 'Container filesystem', text: 'Lost on every container restart. Never store data you need here.' },
+          { icon: 'hourglass', color: 'amber', title: 'Ephemeral volume', text: 'Survives container restarts, deleted together with the Pod. emptyDir, configMap, secret, downwardAPI, projected.' },
+          { icon: 'database', color: 'green', title: 'Persistent volume', text: 'Lives independently of any Pod. Requested through a PersistentVolumeClaim and backed by real storage (cloud disk, NFS, Ceph…).' },
         ] },
         { type: 'callout', kind: 'exam', title: 'The one-line rule', html: 'Volume lifetime ≥ container lifetime. <b>Ephemeral</b> volumes die with the <b>Pod</b>; <b>persistent</b> volumes survive Pod deletion and rescheduling to another node.' },
       ],
@@ -32,14 +32,14 @@ KS.registerChapter('kcna', {
       title: 'The volume types you must recognise: flip to reveal',
       blocks: [
         { type: 'flip', items: [
-          { front: '📂 emptyDir', back: 'Empty directory created when the Pod lands on a node, shared by all containers in the Pod, deleted when the Pod is removed. Scratch space, caches, sidecar hand-off.' },
-          { front: '🖥️ hostPath', back: 'Mounts a file or directory from the <b>node’s</b> filesystem. Ties the Pod to that node’s data and is a security risk. Mostly for system agents.' },
-          { front: '⚙️ configMap', back: 'Projects ConfigMap keys as files. Non-secret configuration such as nginx.conf.' },
-          { front: '🔑 secret', back: 'Projects Secret keys as files on a tmpfs (RAM-backed) mount, so they are never written to the node’s disk.' },
-          { front: '🧩 projected', back: 'Combines several sources (secret, configMap, downwardAPI, serviceAccountToken) into <b>one</b> directory.' },
-          { front: '🪞 downwardAPI', back: 'Exposes the Pod’s own metadata (name, namespace, labels, annotations, resource limits) as files.' },
-          { front: '📎 persistentVolumeClaim', back: 'Mounts durable storage by referencing a PVC by name. The Pod never names the PV or the disk directly.' },
-          { front: '🌱 ephemeral (generic)', back: 'A PVC template inside the Pod spec: a StorageClass provisions a volume for the Pod and it is deleted with the Pod. Persistent-volume features, ephemeral lifetime.' },
+          { front: 'emptyDir', back: 'Empty directory created when the Pod lands on a node, shared by all containers in the Pod, deleted when the Pod is removed. Scratch space, caches, sidecar hand-off.' },
+          { front: 'hostPath', back: 'Mounts a file or directory from the <b>node’s</b> filesystem. Ties the Pod to that node’s data and is a security risk. Mostly for system agents.' },
+          { front: 'configMap', back: 'Projects ConfigMap keys as files. Non-secret configuration such as nginx.conf.' },
+          { front: 'secret', back: 'Projects Secret keys as files on a tmpfs (RAM-backed) mount, so they are never written to the node’s disk.' },
+          { front: 'projected', back: 'Combines several sources (secret, configMap, downwardAPI, serviceAccountToken) into <b>one</b> directory.' },
+          { front: 'downwardAPI', back: 'Exposes the Pod’s own metadata (name, namespace, labels, annotations, resource limits) as files.' },
+          { front: 'persistentVolumeClaim', back: 'Mounts durable storage by referencing a PVC by name. The Pod never names the PV or the disk directly.' },
+          { front: 'ephemeral (generic)', back: 'A PVC template inside the Pod spec: a StorageClass provisions a volume for the Pod and it is deleted with the Pod. Persistent-volume features, ephemeral lifetime.' },
         ] },
       ],
       tip: 'Mounting a Secret as a volume uses <b>tmpfs</b>; that is the reason it does not land on the node’s disk. It is still not encrypted in etcd unless you configure encryption at rest.',
@@ -175,7 +175,7 @@ volumes:
       title: 'From a PVC to a mounted disk',
       blocks: [
         { type: 'diagram', width: 900, height: 390,
-          caption: 'Press ▶ Play to follow a Pod requesting storage from a StorageClass backed by a CSI driver. Click any box for details.',
+          caption: 'Press Play to follow a Pod requesting storage from a StorageClass backed by a CSI driver. Click any box for details.',
           groups: [
             { x: 20, y: 35, w: 400, h: 120, label: 'Namespace: shop', color: 'blue' },
             { x: 20, y: 205, w: 400, h: 165, label: 'Worker node', color: 'green' },
@@ -183,13 +183,13 @@ volumes:
             { x: 660, y: 35, w: 220, h: 335, label: 'Storage side', color: 'teal' },
           ],
           nodes: [
-            { id: 'pod', x: 40, y: 75, w: 160, h: 60, label: 'Pod', icon: '🫛', sub: 'claimName: data', color: 'blue', round: true, info: 'The Pod lists a volume of type <code>persistentVolumeClaim</code> with <code>claimName: data</code>. It does not know (or care) which disk will back it.' },
+            { id: 'pod', x: 40, y: 75, w: 160, h: 60, label: 'Pod', icon: 'box', sub: 'claimName: data', color: 'blue', round: true, info: 'The Pod lists a volume of type <code>persistentVolumeClaim</code> with <code>claimName: data</code>. It does not know (or care) which disk will back it.' },
             { id: 'pvc', x: 240, y: 75, w: 160, h: 60, label: 'PVC: data', sub: '10Gi · RWO', color: 'blue', info: 'Namespaced request for storage: size, access mode and <code>storageClassName: fast-ssd</code>. Status starts as <b>Pending</b>.' },
             { id: 'sc', x: 460, y: 75, w: 160, h: 60, label: 'StorageClass', sub: 'fast-ssd', color: 'purple', info: 'Names the <b>provisioner</b> (a CSI driver), its <b>parameters</b> (disk type, IOPS…), the <b>reclaimPolicy</b> for new PVs, <b>volumeBindingMode</b> and <b>allowVolumeExpansion</b>.' },
             { id: 'prov', x: 680, y: 75, w: 180, h: 60, label: 'CSI controller', sub: 'external-provisioner', color: 'teal', info: 'The controller part of the CSI driver, usually a Deployment. Sidecars like <b>external-provisioner</b>, <b>external-attacher</b>, <b>external-resizer</b> and <b>external-snapshotter</b> watch Kubernetes objects and call the driver over gRPC.' },
-            { id: 'disk', x: 680, y: 190, w: 180, h: 56, label: 'Storage backend', icon: '🧱', sub: 'cloud disk / SAN', color: 'amber', info: 'The real storage: a cloud block disk, an NFS share, a Ceph pool… Kubernetes never talks to it directly, only through the driver.' },
+            { id: 'disk', x: 680, y: 190, w: 180, h: 56, label: 'Storage backend', icon: 'blocks', sub: 'cloud disk / SAN', color: 'amber', info: 'The real storage: a cloud block disk, an NFS share, a Ceph pool… Kubernetes never talks to it directly, only through the driver.' },
             { id: 'pv', x: 460, y: 285, w: 160, h: 60, label: 'PersistentVolume', sub: 'pvc-7f3c…', color: 'purple', info: 'Created automatically by the provisioner. Carries the capacity, access modes, the class’s reclaimPolicy and a <code>claimRef</code> pointing to the PVC.' },
-            { id: 'kubelet', x: 40, y: 250, w: 160, h: 60, label: 'kubelet', icon: '🤖', color: 'green', info: 'Before starting containers, the kubelet waits until all volumes are attached and mounted. Stuck mounts show up as a Pod in <b>ContainerCreating</b> with FailedMount events.' },
+            { id: 'kubelet', x: 40, y: 250, w: 160, h: 60, label: 'kubelet', icon: 'bot', color: 'green', info: 'Before starting containers, the kubelet waits until all volumes are attached and mounted. Stuck mounts show up as a Pod in <b>ContainerCreating</b> with FailedMount events.' },
             { id: 'node', x: 240, y: 250, w: 160, h: 60, label: 'CSI node plugin', sub: 'DaemonSet', color: 'teal', info: 'Runs on every node (DaemonSet). Implements NodeStage/NodePublish: formats if needed and mounts the attached device into the Pod’s volume directory.' },
           ],
           edges: [
@@ -298,12 +298,12 @@ kubectl describe pvc data -n shop`, notes: { 3: 'PVs are cluster-scoped, so a na
       title: 'PV phases and reclaim policies',
       blocks: [
         { type: 'flow', items: [
-          { icon: '🟢', label: 'Available', sub: 'free, not yet bound', info: 'A static PV waiting for a matching PVC.' },
-          { icon: '🔗', label: 'Bound', sub: 'claimed by a PVC', info: 'Exclusive one-to-one binding with a PVC. Pods use it through the PVC.' },
-          { icon: '🗑️', label: 'PVC deleted', sub: 'claim released', info: 'The user deletes the PVC. What happens next depends on <code>persistentVolumeReclaimPolicy</code>.' },
-          { icon: '🟡', label: 'Released', sub: 'Retain: data kept', info: 'With <b>Retain</b>, the PV stays with its data but is not available for a new claim until an admin cleans it up (or removes the claimRef) manually.' },
-          { icon: '❌', label: 'Deleted / Failed', sub: 'Delete: disk removed', info: 'With <b>Delete</b>, the PV object and the backing disk are removed. <b>Failed</b> means automatic reclamation did not succeed.' },
-        ], caption: 'Click Step ▶ or any box.' },
+          { icon: 'circle-dot', label: 'Available', sub: 'free, not yet bound', info: 'A static PV waiting for a matching PVC.' },
+          { icon: 'link', label: 'Bound', sub: 'claimed by a PVC', info: 'Exclusive one-to-one binding with a PVC. Pods use it through the PVC.' },
+          { icon: 'trash-2', label: 'PVC deleted', sub: 'claim released', info: 'The user deletes the PVC. What happens next depends on <code>persistentVolumeReclaimPolicy</code>.' },
+          { icon: 'circle-dot', label: 'Released', sub: 'Retain: data kept', info: 'With <b>Retain</b>, the PV stays with its data but is not available for a new claim until an admin cleans it up (or removes the claimRef) manually.' },
+          { icon: 'circle-x', label: 'Deleted / Failed', sub: 'Delete: disk removed', info: 'With <b>Delete</b>, the PV object and the backing disk are removed. <b>Failed</b> means automatic reclamation did not succeed.' },
+        ], caption: 'Click Step or any box.' },
         { type: 'compare', headers: ['Reclaim policy', 'When the PVC is deleted', 'Default for'], rows: [
           ['Retain', 'PV becomes <b>Released</b>; data and disk kept for manual recovery', 'Manually created PVs'],
           ['Delete', 'PV <b>and</b> the backing storage are deleted', 'Dynamically provisioned PVs (StorageClass default)'],
@@ -320,8 +320,8 @@ kubectl describe pvc data -n shop`, notes: { 3: 'PVs are cluster-scoped, so a na
         { type: 'cols', cols: [
           [
             { type: 'cards', cols: 1, items: [
-              { icon: '⚡', color: 'gray', title: 'volumeBindingMode: Immediate', text: 'Default. The PV is provisioned and bound as soon as the PVC is created, before any Pod is scheduled. Risk: the disk lands in zone A, then the Pod cannot be scheduled because its CPU/affinity needs point to zone B.' },
-              { icon: '⏸️', color: 'green', title: 'volumeBindingMode: WaitForFirstConsumer', text: 'Binding and provisioning wait until a Pod using the PVC is <b>scheduled</b>. The scheduler picks a node first, the volume is created in that node’s topology (zone). The PVC shows <i>Pending: waiting for first consumer</i>, which is normal.' },
+              { icon: 'zap', color: 'gray', title: 'volumeBindingMode: Immediate', text: 'Default. The PV is provisioned and bound as soon as the PVC is created, before any Pod is scheduled. Risk: the disk lands in zone A, then the Pod cannot be scheduled because its CPU/affinity needs point to zone B.' },
+              { icon: 'pause', color: 'green', title: 'volumeBindingMode: WaitForFirstConsumer', text: 'Binding and provisioning wait until a Pod using the PVC is <b>scheduled</b>. The scheduler picks a node first, the volume is created in that node’s topology (zone). The PVC shows <i>Pending: waiting for first consumer</i>, which is normal.' },
             ] },
           ],
           [
@@ -421,9 +421,9 @@ spec:
       title: 'Cloud native storage projects, then match the terms',
       blocks: [
         { type: 'cards', items: [
-          { icon: '♜', color: 'purple', title: 'Rook', text: 'CNCF <b>graduated</b> storage orchestrator. Runs <b>Ceph</b> on Kubernetes via an operator, offering block, file and object storage.' },
-          { icon: '🐂', color: 'teal', title: 'Longhorn', text: 'CNCF project (originated at Rancher): lightweight distributed <b>block</b> storage built from the nodes’ local disks, with replicas, snapshots and backups.' },
-          { icon: '🐙', color: 'gray', title: 'Ceph', text: 'Distributed storage system (block, file, object). Not a CNCF project itself; Rook is how you run it cloud-natively.' },
+          { icon: 'castle', color: 'purple', title: 'Rook', text: 'CNCF <b>graduated</b> storage orchestrator. Runs <b>Ceph</b> on Kubernetes via an operator, offering block, file and object storage.' },
+          { icon: 'beef', color: 'teal', title: 'Longhorn', text: 'CNCF project (originated at Rancher): lightweight distributed <b>block</b> storage built from the nodes’ local disks, with replicas, snapshots and backups.' },
+          { icon: 'git-branch', color: 'gray', title: 'Ceph', text: 'Distributed storage system (block, file, object). Not a CNCF project itself; Rook is how you run it cloud-natively.' },
         ] },
         { type: 'match', pairs: [
           ['emptyDir', 'Scratch space deleted with the Pod'],

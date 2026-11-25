@@ -2,7 +2,7 @@ KS.registerChapter('kcna', {
   id: 'observability',
   title: 'Observability',
   subtitle: 'Metrics, logs and traces: Prometheus, OpenTelemetry, Jaeger, Fluent Bit and the SLOs they serve',
-  icon: '🔭',
+  icon: 'telescope',
   minutes: 30,
   objectives: [
     'Distinguish monitoring from observability and name the signals (metrics, logs, traces, plus events and profiles)',
@@ -34,11 +34,11 @@ KS.registerChapter('kcna', {
       title: 'The three pillars, plus events and profiles',
       blocks: [
         { type: 'flip', items: [
-          { front: '📈 Metrics', back: 'Numeric measurements over time (time series) with labels. Cheap to store, great for dashboards, trends and alerting. Answer “is something wrong and how much?”. Tool: Prometheus.' },
-          { front: '📜 Logs', back: 'Timestamped, discrete text or structured (JSON) records of events inside an application. Rich detail, expensive at volume. Answer “what exactly happened?”. Tools: Fluentd, Fluent Bit.' },
-          { front: '🧵 Traces', back: 'The end-to-end path of one request across services, made of spans with timings. Answer “where is the time spent / which service failed?”. Tools: Jaeger, OpenTelemetry.' },
-          { front: '📣 Events', back: 'Kubernetes Event objects (Scheduled, Pulling, BackOff, FailedScheduling…). Seen with <code>kubectl get events</code> or <code>kubectl describe</code>. Short-lived: kept about one hour by default.' },
-          { front: '🔥 Profiles', back: 'Continuous profiling: which functions use CPU or memory, shown as flame graphs. Often called the emerging “fourth pillar”; OpenTelemetry is adding a profiling signal.' },
+          { front: 'Metrics', back: 'Numeric measurements over time (time series) with labels. Cheap to store, great for dashboards, trends and alerting. Answer “is something wrong and how much?”. Tool: Prometheus.' },
+          { front: 'Logs', back: 'Timestamped, discrete text or structured (JSON) records of events inside an application. Rich detail, expensive at volume. Answer “what exactly happened?”. Tools: Fluentd, Fluent Bit.' },
+          { front: 'Traces', back: 'The end-to-end path of one request across services, made of spans with timings. Answer “where is the time spent / which service failed?”. Tools: Jaeger, OpenTelemetry.' },
+          { front: 'Events', back: 'Kubernetes Event objects (Scheduled, Pulling, BackOff, FailedScheduling…). Seen with <code>kubectl get events</code> or <code>kubectl describe</code>. Short-lived: kept about one hour by default.' },
+          { front: 'Profiles', back: 'Continuous profiling: which functions use CPU or memory, shown as flame graphs. Often called the emerging “fourth pillar”; OpenTelemetry is adding a profiling signal.' },
         ] },
         { type: 'check', q: 'Users report that one API call is slow, and the call passes through six microservices. Which signal best shows which service adds the latency?', options: ['Metrics', 'Distributed traces', 'Kubernetes Events', 'Container logs'], answer: 1, explain: 'A <b>trace</b> records every hop of one request as spans with durations, so the slow span stands out. Metrics show that latency rose but not where in the call chain; logs are per-service and hard to stitch together; Events describe cluster objects, not requests.', ref: 'https://opentelemetry.io/docs/concepts/signals/traces/' },
       ],
@@ -50,24 +50,24 @@ KS.registerChapter('kcna', {
       title: 'A typical cloud native observability stack',
       blocks: [
         { type: 'diagram', width: 900, height: 440,
-          caption: 'Click any component for details, or press ▶ Play to follow the data from the app to your screen.',
+          caption: 'Click any component for details, or press Play to follow the data from the app to your screen.',
           groups: [
             { x: 20, y: 20, w: 250, h: 400, label: 'Sources', color: 'blue' },
             { x: 300, y: 20, w: 290, h: 400, label: 'Collect & store', color: 'green' },
             { x: 620, y: 20, w: 260, h: 400, label: 'Act & visualise', color: 'amber' },
           ],
           nodes: [
-            { id: 'app', x: 45, y: 60, w: 200, h: 60, label: 'App + OTel SDK', icon: '🧩', sub: '/metrics, spans, logs', color: 'blue', info: 'Your service, instrumented with the OpenTelemetry API/SDK (or a Prometheus client library). It exposes metrics on <code>/metrics</code>, emits trace spans and writes logs to stdout/stderr.' },
-            { id: 'exp', x: 45, y: 170, w: 200, h: 56, label: 'Exporters', icon: '🔌', sub: 'node, KSM, blackbox', color: 'teal', info: 'Prometheus exporters translate third-party metrics into the Prometheus format: node_exporter (host), kube-state-metrics (object state), database exporters, blackbox_exporter (probes).' },
-            { id: 'logs', x: 45, y: 280, w: 200, h: 56, label: 'stdout / stderr', icon: '📜', sub: '/var/log/pods on node', color: 'gray', info: 'Containers should log to stdout/stderr. The container runtime writes these streams to files on the node, which <code>kubectl logs</code> and log agents read.' },
-            { id: 'otel', x: 330, y: 50, w: 230, h: 56, label: 'OTel Collector', icon: '🛰️', sub: 'receive → process → export', color: 'purple', info: 'Vendor-neutral pipeline. Receives OTLP (and other formats), processes (batch, filter, add attributes), and exports to any backend: Jaeger, Prometheus, a commercial vendor…' },
-            { id: 'prom', x: 330, y: 160, w: 230, h: 60, label: 'Prometheus', icon: '🔥', sub: 'scrape (pull) + TSDB', color: 'red', info: 'Pulls metrics over HTTP from targets found by service discovery, stores them in its local time-series database and evaluates alerting rules written in PromQL.' },
-            { id: 'jaeger', x: 330, y: 260, w: 110, h: 56, label: 'Jaeger', icon: '🧵', sub: 'traces', color: 'pink', info: 'Distributed tracing backend: stores spans and lets you search traces and view the waterfall of a single request.' },
-            { id: 'fb', x: 450, y: 260, w: 120, h: 56, label: 'Fluent Bit', icon: '🐦', sub: 'DaemonSet', color: 'teal', info: 'Lightweight log processor running as a DaemonSet: one per node, tails container log files, enriches them with Kubernetes metadata and forwards them to a log store.' },
-            { id: 'store', x: 330, y: 350, w: 240, h: 50, label: 'Log store', icon: '🗃️', sub: 'e.g. OpenSearch, Loki', color: 'gray', info: 'Where logs are indexed and searched. Kubernetes itself has no cluster-level log storage, so you must add one.' },
-            { id: 'am', x: 645, y: 160, w: 210, h: 60, label: 'Alertmanager', icon: '🚨', sub: 'group, route, silence', color: 'amber', info: 'Receives alerts from Prometheus, deduplicates, groups and routes them to receivers (email, Slack, PagerDuty, webhooks), and supports silences and inhibition.' },
-            { id: 'graf', x: 645, y: 280, w: 210, h: 60, label: 'Grafana', icon: '📊', sub: 'dashboards', color: 'green', info: 'Visualisation layer that queries many data sources (Prometheus, Jaeger, log stores) in one dashboard. Note: Grafana is a Grafana Labs project, not a CNCF project.' },
-            { id: 'oncall', x: 645, y: 60, w: 210, h: 56, label: 'On-call engineer', icon: '📟', color: 'gray', info: 'The human who gets paged. Good alerting pages only on symptoms that threaten an SLO.' },
+            { id: 'app', x: 45, y: 60, w: 200, h: 60, label: 'App + OTel SDK', icon: 'puzzle', sub: '/metrics, spans, logs', color: 'blue', info: 'Your service, instrumented with the OpenTelemetry API/SDK (or a Prometheus client library). It exposes metrics on <code>/metrics</code>, emits trace spans and writes logs to stdout/stderr.' },
+            { id: 'exp', x: 45, y: 170, w: 200, h: 56, label: 'Exporters', icon: 'plug', sub: 'node, KSM, blackbox', color: 'teal', info: 'Prometheus exporters translate third-party metrics into the Prometheus format: node_exporter (host), kube-state-metrics (object state), database exporters, blackbox_exporter (probes).' },
+            { id: 'logs', x: 45, y: 280, w: 200, h: 56, label: 'stdout / stderr', icon: 'scroll-text', sub: '/var/log/pods on node', color: 'gray', info: 'Containers should log to stdout/stderr. The container runtime writes these streams to files on the node, which <code>kubectl logs</code> and log agents read.' },
+            { id: 'otel', x: 330, y: 50, w: 230, h: 56, label: 'OTel Collector', icon: 'satellite', sub: 'receive → process → export', color: 'purple', info: 'Vendor-neutral pipeline. Receives OTLP (and other formats), processes (batch, filter, add attributes), and exports to any backend: Jaeger, Prometheus, a commercial vendor…' },
+            { id: 'prom', x: 330, y: 160, w: 230, h: 60, label: 'Prometheus', icon: 'flame', sub: 'scrape (pull) + TSDB', color: 'red', info: 'Pulls metrics over HTTP from targets found by service discovery, stores them in its local time-series database and evaluates alerting rules written in PromQL.' },
+            { id: 'jaeger', x: 330, y: 260, w: 110, h: 56, label: 'Jaeger', icon: 'list-tree', sub: 'traces', color: 'pink', info: 'Distributed tracing backend: stores spans and lets you search traces and view the waterfall of a single request.' },
+            { id: 'fb', x: 450, y: 260, w: 120, h: 56, label: 'Fluent Bit', icon: 'bird', sub: 'DaemonSet', color: 'teal', info: 'Lightweight log processor running as a DaemonSet: one per node, tails container log files, enriches them with Kubernetes metadata and forwards them to a log store.' },
+            { id: 'store', x: 330, y: 350, w: 240, h: 50, label: 'Log store', icon: 'archive', sub: 'e.g. OpenSearch, Loki', color: 'gray', info: 'Where logs are indexed and searched. Kubernetes itself has no cluster-level log storage, so you must add one.' },
+            { id: 'am', x: 645, y: 160, w: 210, h: 60, label: 'Alertmanager', icon: 'siren', sub: 'group, route, silence', color: 'amber', info: 'Receives alerts from Prometheus, deduplicates, groups and routes them to receivers (email, Slack, PagerDuty, webhooks), and supports silences and inhibition.' },
+            { id: 'graf', x: 645, y: 280, w: 210, h: 60, label: 'Grafana', icon: 'chart-column', sub: 'dashboards', color: 'green', info: 'Visualisation layer that queries many data sources (Prometheus, Jaeger, log stores) in one dashboard. Note: Grafana is a Grafana Labs project, not a CNCF project.' },
+            { id: 'oncall', x: 645, y: 60, w: 210, h: 56, label: 'On-call engineer', icon: 'cpu', color: 'gray', info: 'The human who gets paged. Good alerting pages only on symptoms that threaten an SLO.' },
           ],
           edges: [
             { from: 'app', to: 'otel', label: 'OTLP', color: 'purple' },
@@ -181,11 +181,11 @@ kube_deployment_status_replicas_available < kube_deployment_spec_replicas`, note
       title: 'Alertmanager and the Prometheus Operator',
       blocks: [
         { type: 'flow', items: [
-          { icon: '📐', label: 'Alerting rule', sub: 'PromQL + for: 5m', info: 'Prometheus evaluates rules periodically. An expression must stay true for the <code>for</code> duration before the alert moves from pending to firing.' },
-          { icon: '🔥', label: 'Prometheus fires', sub: 'sends alert', info: 'Prometheus does not send email or chat messages itself; it pushes firing alerts to Alertmanager.' },
-          { icon: '🧹', label: 'Deduplicate & group', sub: 'Alertmanager', info: 'Alerts from HA Prometheus pairs are deduplicated; many similar alerts (e.g. 50 Pods down) are grouped into one notification.' },
-          { icon: '🤫', label: 'Silence / inhibit', sub: 'mute noise', info: '<b>Silences</b> mute alerts for a time window (maintenance). <b>Inhibition</b> suppresses lower-level alerts while a related higher-level alert fires (node down hides its Pod alerts).' },
-          { icon: '📟', label: 'Route to receiver', sub: 'Slack, email, pager', info: 'A routing tree sends alerts to receivers based on labels such as team or severity.' },
+          { icon: 'ruler', label: 'Alerting rule', sub: 'PromQL + for: 5m', info: 'Prometheus evaluates rules periodically. An expression must stay true for the <code>for</code> duration before the alert moves from pending to firing.' },
+          { icon: 'flame', label: 'Prometheus fires', sub: 'sends alert', info: 'Prometheus does not send email or chat messages itself; it pushes firing alerts to Alertmanager.' },
+          { icon: 'eraser', label: 'Deduplicate & group', sub: 'Alertmanager', info: 'Alerts from HA Prometheus pairs are deduplicated; many similar alerts (e.g. 50 Pods down) are grouped into one notification.' },
+          { icon: 'eye-off', label: 'Silence / inhibit', sub: 'mute noise', info: '<b>Silences</b> mute alerts for a time window (maintenance). <b>Inhibition</b> suppresses lower-level alerts while a related higher-level alert fires (node down hides its Pod alerts).' },
+          { icon: 'cpu', label: 'Route to receiver', sub: 'Slack, email, pager', info: 'A routing tree sends alerts to receivers based on labels such as team or severity.' },
         ] },
         { type: 'code', lang: 'yaml', title: 'servicemonitor.yaml (Prometheus Operator CRD)', code: `
 apiVersion: monitoring.coreos.com/v1
@@ -216,10 +216,10 @@ spec:
       blocks: [
         { type: 'text', html: '<b>OpenTelemetry (OTel)</b> is a CNCF incubating project formed in 2019 by merging <b>OpenTracing</b> and <b>OpenCensus</b>. It standardises how you <i>generate, collect and export</i> traces, metrics and logs, so you instrument once and send data to any backend. It is <b>not</b> a storage backend or a dashboard.' },
         { type: 'cards', cols: 2, items: [
-          { icon: '📝', color: 'blue', title: 'API', text: 'Language-specific interfaces your code calls to create spans and record metrics. Safe to use in libraries; does nothing until an SDK is configured.' },
-          { icon: '⚙️', color: 'purple', title: 'SDK', text: 'The implementation of the API: sampling, batching, resource attributes and exporters. Auto-instrumentation agents exist for many languages.' },
-          { icon: '🛰️', color: 'green', title: 'Collector', text: 'Standalone binary: <b>receivers → processors → exporters</b>. Runs as an agent (sidecar or DaemonSet) or as a central gateway Deployment.' },
-          { icon: '📡', color: 'amber', title: 'OTLP', text: 'OpenTelemetry Protocol over gRPC or HTTP. The native wire format between SDKs, Collectors and backends.' },
+          { icon: 'notebook-pen', color: 'blue', title: 'API', text: 'Language-specific interfaces your code calls to create spans and record metrics. Safe to use in libraries; does nothing until an SDK is configured.' },
+          { icon: 'settings', color: 'purple', title: 'SDK', text: 'The implementation of the API: sampling, batching, resource attributes and exporters. Auto-instrumentation agents exist for many languages.' },
+          { icon: 'satellite', color: 'green', title: 'Collector', text: 'Standalone binary: <b>receivers → processors → exporters</b>. Runs as an agent (sidecar or DaemonSet) or as a central gateway Deployment.' },
+          { icon: 'radio-tower', color: 'amber', title: 'OTLP', text: 'OpenTelemetry Protocol over gRPC or HTTP. The native wire format between SDKs, Collectors and backends.' },
         ] },
         { type: 'callout', kind: 'trap', title: 'OpenTelemetry ≠ OpenMetrics ≠ OpenTracing', html: '<b>OpenMetrics</b> is a text <i>format</i> for exposing metrics, derived from the Prometheus exposition format. <b>OpenTracing</b> was a tracing API, now archived and superseded by OTel. <b>OpenTelemetry</b> is the full project covering all signals.' },
       ],
@@ -300,10 +300,10 @@ traceparent: 00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01`, notes: {
       title: 'SLI, SLO, SLA and error budgets',
       blocks: [
         { type: 'cards', cols: 2, items: [
-          { icon: '📏', color: 'blue', title: 'SLI: indicator', text: 'A measured ratio of good events: e.g. share of requests answered successfully in under 300 ms.' },
-          { icon: '🎯', color: 'green', title: 'SLO: objective', text: 'An internal target for an SLI over a window: “99.9% of requests succeed over 30 days”.' },
-          { icon: '📄', color: 'amber', title: 'SLA: agreement', text: 'A contract with customers, with consequences (credits, refunds) if missed. Usually looser than the SLO.' },
-          { icon: '💰', color: 'red', title: 'Error budget', text: '1 − SLO. The amount of unreliability you may “spend” on releases and experiments. Budget gone → slow down and fix reliability.' },
+          { icon: 'ruler', color: 'blue', title: 'SLI: indicator', text: 'A measured ratio of good events: e.g. share of requests answered successfully in under 300 ms.' },
+          { icon: 'target', color: 'green', title: 'SLO: objective', text: 'An internal target for an SLI over a window: “99.9% of requests succeed over 30 days”.' },
+          { icon: 'file-text', color: 'amber', title: 'SLA: agreement', text: 'A contract with customers, with consequences (credits, refunds) if missed. Usually looser than the SLO.' },
+          { icon: 'coins', color: 'red', title: 'Error budget', text: '1 − SLO. The amount of unreliability you may “spend” on releases and experiments. Budget gone → slow down and fix reliability.' },
         ] },
         { type: 'stats', items: [
           { value: '99.9%', label: 'SLO over 30 days' },
@@ -321,10 +321,10 @@ traceparent: 00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01`, notes: {
       blocks: [
         { type: 'text', html: 'Cloud bills arrive per VM or per account, but teams work per namespace, Deployment and label. <b>Cost observability</b> allocates infrastructure cost to Kubernetes workloads so teams can see and own what they spend. <b>FinOps</b> is the cultural practice that brings engineering, finance and business together around cloud cost; the <b>FinOps Foundation</b> is part of the Linux Foundation.' },
         { type: 'cards', items: [
-          { icon: '🪙', color: 'green', title: 'OpenCost', text: 'CNCF project and vendor-neutral spec for measuring and allocating Kubernetes cost by namespace, workload, label and more. Originated by Kubecost; works with Prometheus data.' },
-          { icon: '📐', color: 'blue', title: 'Requests drive cost', text: 'Allocation usually uses max(request, usage). Oversized requests waste money even if the app is idle.' },
-          { icon: '🏷️', color: 'purple', title: 'Labels for showback', text: 'Consistent labels (team, app, cost-center) make showback and chargeback possible.' },
-          { icon: '📉', color: 'amber', title: 'Right-sizing', text: 'Compare usage with requests; tools such as VPA recommendations help shrink waste.' },
+          { icon: 'coins', color: 'green', title: 'OpenCost', text: 'CNCF project and vendor-neutral spec for measuring and allocating Kubernetes cost by namespace, workload, label and more. Originated by Kubecost; works with Prometheus data.' },
+          { icon: 'ruler', color: 'blue', title: 'Requests drive cost', text: 'Allocation usually uses max(request, usage). Oversized requests waste money even if the app is idle.' },
+          { icon: 'tag', color: 'purple', title: 'Labels for showback', text: 'Consistent labels (team, app, cost-center) make showback and chargeback possible.' },
+          { icon: 'trending-down', color: 'amber', title: 'Right-sizing', text: 'Compare usage with requests; tools such as VPA recommendations help shrink waste.' },
         ] },
         { type: 'match', title: 'Which tool for which job?', pairs: [
           ['Pull-based metrics and alert rules', 'Prometheus'],

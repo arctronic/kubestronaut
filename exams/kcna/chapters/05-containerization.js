@@ -2,7 +2,7 @@ KS.registerChapter('kcna', {
   id: 'containerization',
   title: 'Containerization',
   subtitle: 'From Linux namespaces to OCI images, runtimes and RuntimeClass: what actually runs inside a Pod',
-  icon: '📦',
+  icon: 'package',
   minutes: 35,
   objectives: [
     'Contrast containers with virtual machines and name the kernel features (namespaces, cgroups) that make containers possible',
@@ -52,16 +52,16 @@ KS.registerChapter('kcna', {
       blocks: [
         { type: 'text', html: 'A container is just a normal Linux process with two kernel features applied: <b>namespaces</b> control what it can <i>see</i>, <b>cgroups</b> control how much it can <i>use</i>.' },
         { type: 'flip', title: 'Linux namespaces (click to flip)', items: [
-          { front: '🔢 PID', back: 'Own process tree: the app sees itself as PID 1 and cannot see host processes.' },
-          { front: '🌐 NET', back: 'Own network interfaces, IPs, routes and ports. In Kubernetes all containers of a Pod <b>share</b> one network namespace, hence one Pod IP.' },
-          { front: '📁 MNT', back: 'Own mount table and root filesystem (the image).' },
-          { front: '🏷️ UTS', back: 'Own hostname and domain name.' },
-          { front: '📨 IPC', back: 'Own System V IPC / POSIX message queues and shared memory.' },
-          { front: '👤 USER', back: 'Maps UIDs inside to different UIDs outside, so root in the container need not be root on the host.' },
+          { front: 'PID', back: 'Own process tree: the app sees itself as PID 1 and cannot see host processes.' },
+          { front: 'NET', back: 'Own network interfaces, IPs, routes and ports. In Kubernetes all containers of a Pod <b>share</b> one network namespace, hence one Pod IP.' },
+          { front: 'MNT', back: 'Own mount table and root filesystem (the image).' },
+          { front: 'UTS', back: 'Own hostname and domain name.' },
+          { front: 'IPC', back: 'Own System V IPC / POSIX message queues and shared memory.' },
+          { front: 'USER', back: 'Maps UIDs inside to different UIDs outside, so root in the container need not be root on the host.' },
         ] },
         { type: 'cards', cols: 2, items: [
-          { icon: '📏', color: 'green', title: 'cgroups (control groups)', text: 'Limit and account CPU, memory, I/O and PIDs per group of processes. Kubernetes <b>resource limits</b> are enforced through cgroups; cgroup v2 is the modern unified version.' },
-          { icon: '🛡️', color: 'red', title: 'Extra hardening', text: '<b>Capabilities</b> split root powers into pieces you can drop; <b>seccomp</b> filters syscalls; <b>AppArmor/SELinux</b> restrict file and process access. All configurable via a Pod’s <code>securityContext</code>.' },
+          { icon: 'ruler', color: 'green', title: 'cgroups (control groups)', text: 'Limit and account CPU, memory, I/O and PIDs per group of processes. Kubernetes <b>resource limits</b> are enforced through cgroups; cgroup v2 is the modern unified version.' },
+          { icon: 'shield', color: 'red', title: 'Extra hardening', text: '<b>Capabilities</b> split root powers into pieces you can drop; <b>seccomp</b> filters syscalls; <b>AppArmor/SELinux</b> restrict file and process access. All configurable via a Pod’s <code>securityContext</code>.' },
         ] },
       ],
       tip: 'Mnemonic: namespaces = <b>what you see</b>, cgroups = <b>what you get</b>. “Which kernel feature limits memory?” → cgroups. “Which isolates the process tree?” → PID namespace.',
@@ -118,11 +118,11 @@ ENTRYPOINT ["/app"]`, notes: { 2: '<b>Stage 1</b> (named <code>build</code>) has
           ],
           [
             { type: 'cards', cols: 1, items: [
-              { icon: '🪜', color: 'blue', title: 'Multi-stage builds', text: 'Build in one stage, ship only the artifact in a minimal final stage.' },
-              { icon: '🪶', color: 'green', title: 'Small base', text: 'distroless, alpine or slim variants: fewer packages, fewer CVEs, faster pulls.' },
-              { icon: '🙅', color: 'red', title: 'Non-root', text: '<code>USER</code> in the image, plus <code>runAsNonRoot: true</code> in the Pod securityContext.' },
-              { icon: '📌', color: 'amber', title: 'Pin versions', text: 'Pin base image tags (or digests) and package versions for reproducible builds.' },
-              { icon: '🙈', color: 'gray', title: '.dockerignore & no secrets', text: 'Exclude .git, local configs and credentials from the build context. Secrets baked into a layer stay there forever.' },
+              { icon: 'chevrons-up', color: 'blue', title: 'Multi-stage builds', text: 'Build in one stage, ship only the artifact in a minimal final stage.' },
+              { icon: 'feather', color: 'green', title: 'Small base', text: 'distroless, alpine or slim variants: fewer packages, fewer CVEs, faster pulls.' },
+              { icon: 'ban', color: 'red', title: 'Non-root', text: '<code>USER</code> in the image, plus <code>runAsNonRoot: true</code> in the Pod securityContext.' },
+              { icon: 'pin', color: 'amber', title: 'Pin versions', text: 'Pin base image tags (or digests) and package versions for reproducible builds.' },
+              { icon: 'eye-off', color: 'gray', title: '.dockerignore & no secrets', text: 'Exclude .git, local configs and credentials from the build context. Secrets baked into a layer stay there forever.' },
             ] },
           ],
         ] },
@@ -179,9 +179,9 @@ docker push registry.example.com/team/payments:1.4.2`, notes: { 2: 'Full referen
       blocks: [
         { type: 'text', html: 'The <b>OCI</b> is a Linux Foundation project, founded in 2015 by Docker, CoreOS and others, that defines open standards so any tool can build, ship and run any container. It maintains three specifications and the reference runtime <b>runc</b>.' },
         { type: 'cards', items: [
-          { icon: '🖼️', color: 'blue', title: 'Image spec', text: 'Format of an image: manifest, config, layers (and index for multi-arch). An image built by Docker, Podman or Buildah is the same OCI image.' },
-          { icon: '🏃', color: 'green', title: 'Runtime spec', text: 'How to run a “filesystem bundle” plus <code>config.json</code> as a container: lifecycle create/start/kill/delete. Implemented by runc, crun, gVisor (runsc), Kata.' },
-          { icon: '🚚', color: 'purple', title: 'Distribution spec', text: 'HTTP API for pushing and pulling content to and from registries. Any compliant registry can serve images and other artifacts (Helm charts, signatures, SBOMs).' },
+          { icon: 'image', color: 'blue', title: 'Image spec', text: 'Format of an image: manifest, config, layers (and index for multi-arch). An image built by Docker, Podman or Buildah is the same OCI image.' },
+          { icon: 'activity', color: 'green', title: 'Runtime spec', text: 'How to run a “filesystem bundle” plus <code>config.json</code> as a container: lifecycle create/start/kill/delete. Implemented by runc, crun, gVisor (runsc), Kata.' },
+          { icon: 'truck', color: 'purple', title: 'Distribution spec', text: 'HTTP API for pushing and pulling content to and from registries. Any compliant registry can serve images and other artifacts (Helm charts, signatures, SBOMs).' },
         ] },
         { type: 'compare', headers: ['Don’t confuse', 'Standard', 'Scope'], rows: [
           ['OCI', 'Open Container Initiative', 'Image format, runtime, registry API'],
@@ -198,18 +198,18 @@ docker push registry.example.com/team/payments:1.4.2`, notes: { 2: 'Full referen
       title: 'From kubelet to a running process',
       blocks: [
         { type: 'diagram', width: 900, height: 400,
-          caption: 'Press ▶ Play to follow a container start, or click a component.',
+          caption: 'Press Play to follow a container start, or click a component.',
           groups: [
             { x: 20, y: 20, w: 860, h: 360, label: 'Worker node', color: 'green' },
           ],
           nodes: [
-            { id: 'kubelet', x: 50, y: 70, w: 150, h: 56, label: 'kubelet', icon: '🤖', color: 'green', info: 'Gets the Pod spec from the API server and asks the runtime, over the <b>CRI</b> (gRPC), to pull images, create the Pod sandbox and start containers.' },
+            { id: 'kubelet', x: 50, y: 70, w: 150, h: 56, label: 'kubelet', icon: 'bot', color: 'green', info: 'Gets the Pod spec from the API server and asks the runtime, over the <b>CRI</b> (gRPC), to pull images, create the Pod sandbox and start containers.' },
             { id: 'high', x: 290, y: 70, w: 170, h: 56, label: 'containerd / CRI-O', sub: 'high-level runtime', color: 'pink', fs: 13, info: '<b>High-level runtimes</b> implement CRI: manage images (pull, unpack, store), snapshots, sandboxes and container lifecycle. containerd is a CNCF graduated project; CRI-O is built specifically for Kubernetes.' },
-            { id: 'reg', x: 560, y: 70, w: 150, h: 56, label: 'Registry', icon: '🗃️', sub: 'OCI distribution', color: 'purple', info: 'The image is pulled from an OCI-compliant registry using the distribution spec, then unpacked into layers on the node.' },
+            { id: 'reg', x: 560, y: 70, w: 150, h: 56, label: 'Registry', icon: 'archive', sub: 'OCI distribution', color: 'purple', info: 'The image is pulled from an OCI-compliant registry using the distribution spec, then unpacked into layers on the node.' },
             { id: 'cni', x: 560, y: 175, w: 150, h: 56, label: 'CNI plugin', sub: 'Pod network', color: 'teal', info: 'When the Pod sandbox is created, the runtime calls the CNI plugin to set up the Pod’s network namespace and IP.' },
             { id: 'shim', x: 290, y: 175, w: 170, h: 56, label: 'shim', sub: 'per container/Pod', color: 'gray', info: 'A small shim process (e.g. containerd-shim-runc-v2) sits between the runtime and the container so the container survives runtime restarts and its exit status is collected.' },
             { id: 'low', x: 290, y: 280, w: 170, h: 56, label: 'runc / crun', sub: 'low-level OCI runtime', color: 'amber', info: '<b>Low-level runtimes</b> implement the OCI runtime spec: they ask the kernel to create namespaces and cgroups and start the process, then exit. runc (Go) is the reference implementation; crun is written in C. Sandboxed alternatives: gVisor (runsc), Kata Containers.' },
-            { id: 'proc', x: 560, y: 280, w: 150, h: 56, label: 'Container', icon: '📦', sub: 'isolated process', color: 'blue', round: true, info: 'Just a Linux process in its own namespaces, limited by cgroups, with the image layers as its root filesystem.' },
+            { id: 'proc', x: 560, y: 280, w: 150, h: 56, label: 'Container', icon: 'package', sub: 'isolated process', color: 'blue', round: true, info: 'Just a Linux process in its own namespaces, limited by cgroups, with the image layers as its root filesystem.' },
             { id: 'kernel', x: 50, y: 280, w: 150, h: 56, label: 'Linux kernel', sub: 'namespaces + cgroups', color: 'green', info: 'Every container on the node shares this kernel, which is why kernel isolation features (and sandboxed runtimes) matter for security.' },
           ],
           edges: [
@@ -295,11 +295,11 @@ spec:
       title: 'Building, scanning and signing images',
       blocks: [
         { type: 'cards', items: [
-          { icon: '🐳', color: 'blue', title: 'Docker / BuildKit', text: 'The classic <code>docker build</code>. BuildKit is its modern build engine: parallel stages, better caching, build secrets, multi-platform builds (<code>docker buildx</code>).' },
-          { icon: '🦭', color: 'purple', title: 'Podman', text: '<b>Daemonless</b>, rootless-friendly, Docker-compatible CLI (<code>alias docker=podman</code>). Can also generate Kubernetes YAML from containers.' },
-          { icon: '🧱', color: 'teal', title: 'Buildah', text: 'Builds OCI images without a daemon, from a Dockerfile or step by step with scripts. Podman uses it for builds.' },
-          { icon: '🏗️', color: 'amber', title: 'kaniko', text: 'Builds images from a Dockerfile <b>inside a container or Kubernetes Pod</b> without access to a Docker daemon: common in in-cluster CI.' },
-          { icon: '🧪', color: 'green', title: 'Buildpacks', text: 'Cloud Native Buildpacks turn source code into an OCI image <b>without a Dockerfile</b> by detecting the language.' },
+          { icon: 'container', color: 'blue', title: 'Docker / BuildKit', text: 'The classic <code>docker build</code>. BuildKit is its modern build engine: parallel stages, better caching, build secrets, multi-platform builds (<code>docker buildx</code>).' },
+          { icon: 'container', color: 'purple', title: 'Podman', text: '<b>Daemonless</b>, rootless-friendly, Docker-compatible CLI (<code>alias docker=podman</code>). Can also generate Kubernetes YAML from containers.' },
+          { icon: 'blocks', color: 'teal', title: 'Buildah', text: 'Builds OCI images without a daemon, from a Dockerfile or step by step with scripts. Podman uses it for builds.' },
+          { icon: 'construction', color: 'amber', title: 'kaniko', text: 'Builds images from a Dockerfile <b>inside a container or Kubernetes Pod</b> without access to a Docker daemon: common in in-cluster CI.' },
+          { icon: 'flask-conical', color: 'green', title: 'Buildpacks', text: 'Cloud Native Buildpacks turn source code into an OCI image <b>without a Dockerfile</b> by detecting the language.' },
         ] },
         { type: 'compare', headers: ['Supply-chain step', 'Typical tools', 'What it gives you'], rows: [
           ['Scan for vulnerabilities', '<b>Trivy</b>, Grype', 'Known CVEs in OS packages and libraries, misconfigurations'],

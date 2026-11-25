@@ -2,7 +2,7 @@ KS.registerChapter('kcna', {
   id: 'objects',
   title: 'Objects & Workloads',
   subtitle: 'Pods, the controllers that manage them, and how configuration, health checks and resources are attached',
-  icon: '🧱',
+  icon: 'blocks',
   minutes: 35,
   objectives: [
     'Describe what containers in one Pod share, and when to use init containers and sidecars',
@@ -21,9 +21,9 @@ KS.registerChapter('kcna', {
           [
             { type: 'text', html: 'Kubernetes never schedules a bare container. It schedules a <b>Pod</b>: a group of one or more containers that are always placed on the <b>same node</b> and share a context.' },
             { type: 'cards', cols: 1, items: [
-              { icon: '🌐', color: 'blue', title: 'Shared network', text: 'One IP address and one port space per Pod. Containers talk to each other over <code>localhost</code>, so two containers cannot both listen on port 80.' },
-              { icon: '💾', color: 'green', title: 'Shared storage', text: 'Volumes are declared at Pod level and mounted into any container. <code>emptyDir</code> is the classic scratch space shared by containers.' },
-              { icon: '♻️', color: 'amber', title: 'Shared fate', text: 'Pods are ephemeral and are not “moved”. A replacement Pod gets a new name and a new IP. That is why you put controllers and Services in front of them.' },
+              { icon: 'globe', color: 'blue', title: 'Shared network', text: 'One IP address and one port space per Pod. Containers talk to each other over <code>localhost</code>, so two containers cannot both listen on port 80.' },
+              { icon: 'save', color: 'green', title: 'Shared storage', text: 'Volumes are declared at Pod level and mounted into any container. <code>emptyDir</code> is the classic scratch space shared by containers.' },
+              { icon: 'recycle', color: 'amber', title: 'Shared fate', text: 'Pods are ephemeral and are not “moved”. A replacement Pod gets a new name and a new IP. That is why you put controllers and Services in front of them.' },
             ] },
           ],
           [
@@ -62,11 +62,11 @@ spec:
       title: 'Init containers, sidecars and multi-container patterns',
       blocks: [
         { type: 'flip', title: 'Flip each pattern', items: [
-          { front: '🚦 Init container', back: 'Listed under <code>initContainers</code>. Runs <b>to completion, one after another</b>, before any app container starts. Typical use: wait for a database, run a migration, fetch config. If one fails, the kubelet retries it according to the Pod’s restartPolicy.' },
-          { front: '🛵 Native sidecar', back: 'An init container with <code>restartPolicy: Always</code>. It starts before the app containers, <b>keeps running</b> alongside them and is stopped after them. Does not block a Job from completing. GA in Kubernetes 1.33.' },
-          { front: '🧩 Sidecar pattern', back: 'A helper that extends the main container: log shipper, config reloader, service mesh proxy (Envoy in Istio).' },
-          { front: '🔌 Ambassador', back: 'A proxy that represents an <b>outside</b> service to the app. The app talks to <code>localhost</code>; the ambassador handles connection details, sharding or TLS.' },
-          { front: '🔄 Adapter', back: 'Transforms the app’s output into a standard format, e.g. converts custom metrics into Prometheus format.' },
+          { front: 'Init container', back: 'Listed under <code>initContainers</code>. Runs <b>to completion, one after another</b>, before any app container starts. Typical use: wait for a database, run a migration, fetch config. If one fails, the kubelet retries it according to the Pod’s restartPolicy.' },
+          { front: 'Native sidecar', back: 'An init container with <code>restartPolicy: Always</code>. It starts before the app containers, <b>keeps running</b> alongside them and is stopped after them. Does not block a Job from completing. GA in Kubernetes 1.33.' },
+          { front: 'Sidecar pattern', back: 'A helper that extends the main container: log shipper, config reloader, service mesh proxy (Envoy in Istio).' },
+          { front: 'Ambassador', back: 'A proxy that represents an <b>outside</b> service to the app. The app talks to <code>localhost</code>; the ambassador handles connection details, sharding or TLS.' },
+          { front: 'Adapter', back: 'Transforms the app’s output into a standard format, e.g. converts custom metrics into Prometheus format.' },
         ] },
         { type: 'code', lang: 'yaml', title: 'init container + native sidecar', code: `
 spec:
@@ -89,11 +89,11 @@ spec:
       title: 'Pod phases and restartPolicy',
       blocks: [
         { type: 'flow', caption: 'The five values of <code>status.phase</code>. Click a phase for details.', items: [
-          { icon: '⏳', label: 'Pending', sub: 'accepted, not running yet', info: 'The Pod object exists but at least one container is not yet running: waiting to be scheduled, pulling images, or running init containers.' },
-          { icon: '🏃', label: 'Running', sub: 'bound, ≥1 container up', info: 'The Pod is bound to a node and at least one container is running, starting or restarting.' },
-          { icon: '✅', label: 'Succeeded', sub: 'all exited 0', info: 'All containers terminated successfully and will not be restarted. Typical end state of a Job Pod.' },
-          { icon: '❌', label: 'Failed', sub: 'all exited, ≥1 error', info: 'All containers terminated and at least one exited with a non-zero code or was killed by the system.' },
-          { icon: '❓', label: 'Unknown', sub: 'node unreachable', info: 'The state could not be obtained, usually because the API server lost contact with the node’s kubelet.' },
+          { icon: 'hourglass', label: 'Pending', sub: 'accepted, not running yet', info: 'The Pod object exists but at least one container is not yet running: waiting to be scheduled, pulling images, or running init containers.' },
+          { icon: 'activity', label: 'Running', sub: 'bound, ≥1 container up', info: 'The Pod is bound to a node and at least one container is running, starting or restarting.' },
+          { icon: 'circle-check', label: 'Succeeded', sub: 'all exited 0', info: 'All containers terminated successfully and will not be restarted. Typical end state of a Job Pod.' },
+          { icon: 'circle-x', label: 'Failed', sub: 'all exited, ≥1 error', info: 'All containers terminated and at least one exited with a non-zero code or was killed by the system.' },
+          { icon: 'circle-help', label: 'Unknown', sub: 'node unreachable', info: 'The state could not be obtained, usually because the API server lost contact with the node’s kubelet.' },
         ] },
         { type: 'compare', headers: ['restartPolicy', 'Container restarted when…', 'Allowed in'], rows: [
           ['<code>Always</code> (default)', 'it exits for any reason', 'Pods, Deployments, StatefulSets, DaemonSets (required there)'],
@@ -140,19 +140,19 @@ kubectl label pod web-7d4f tier-`, notes: { 1: 'Adds a LABELS column.', 4: 'Sele
       blocks: [
         { type: 'diagram', width: 900, height: 420,
           intro: 'A Deployment with <code>replicas: 3</code>, <code>maxSurge: 1</code>, <code>maxUnavailable: 0</code> is updated from v1 to v2.',
-          caption: 'Press ▶ Play to watch <code>kubectl set image deployment/web app=web:v2</code> roll out, or click any box.',
+          caption: 'Press Play to watch <code>kubectl set image deployment/web app=web:v2</code> roll out, or click any box.',
           groups: [
             { x: 230, y: 10, w: 660, h: 130, label: 'Old ReplicaSet (revision 1)', color: 'gray' },
             { x: 230, y: 270, w: 660, h: 140, label: 'New ReplicaSet (revision 2)', color: 'green' },
           ],
           nodes: [
-            { id: 'dep', x: 20, y: 180, w: 170, h: 60, label: 'Deployment', icon: '🚀', sub: 'web · replicas 3', color: 'blue', info: 'Owns ReplicaSets, not Pods directly. It stores the strategy (RollingUpdate or Recreate) and keeps old ReplicaSets (up to <code>revisionHistoryLimit</code>, default 10) for rollbacks.' },
+            { id: 'dep', x: 20, y: 180, w: 170, h: 60, label: 'Deployment', icon: 'rocket', sub: 'web · replicas 3', color: 'blue', info: 'Owns ReplicaSets, not Pods directly. It stores the strategy (RollingUpdate or Recreate) and keeps old ReplicaSets (up to <code>revisionHistoryLimit</code>, default 10) for rollbacks.' },
             { id: 'rs1', x: 250, y: 50, w: 170, h: 60, label: 'ReplicaSet', sub: 'web-6b9f · image v1', color: 'gray', info: 'Created for the original Pod template. Its name and its Pods carry a <code>pod-template-hash</code> label so the two ReplicaSets never select each other’s Pods.' },
             { id: 'rs2', x: 250, y: 310, w: 170, h: 60, label: 'ReplicaSet', sub: 'web-7c5d · image v2', color: 'green', info: 'Created when the Pod template changed (new image). Only changes to <code>spec.template</code> trigger a rollout; scaling replicas does not.' },
             { id: 'p1a', x: 460, y: 55, w: 120, h: 50, label: 'Pod v1', round: true, color: 'gray', info: 'Old Pod. Will be terminated once a v2 Pod is Ready.' },
             { id: 'p1b', x: 600, y: 55, w: 120, h: 50, label: 'Pod v1', round: true, color: 'gray', info: 'Old Pod. Still receiving traffic from the Service during the rollout.' },
             { id: 'p1c', x: 740, y: 55, w: 120, h: 50, label: 'Pod v1', round: true, color: 'gray', info: 'Old Pod. The last one to go.' },
-            { id: 'svc', x: 620, y: 180, w: 160, h: 56, label: 'Service', icon: '🔀', sub: 'selector app=web', color: 'teal', info: 'The Service selects <code>app=web</code>, which matches Pods of <b>both</b> ReplicaSets. During a rolling update users can hit v1 and v2. Only <b>Ready</b> Pods receive traffic.' },
+            { id: 'svc', x: 620, y: 180, w: 160, h: 56, label: 'Service', icon: 'shuffle', sub: 'selector app=web', color: 'teal', info: 'The Service selects <code>app=web</code>, which matches Pods of <b>both</b> ReplicaSets. During a rolling update users can hit v1 and v2. Only <b>Ready</b> Pods receive traffic.' },
             { id: 'p2a', x: 460, y: 315, w: 120, h: 50, label: 'Pod v2', round: true, color: 'green', info: 'First new Pod, created by surging to 4 Pods total.' },
             { id: 'p2b', x: 600, y: 315, w: 120, h: 50, label: 'Pod v2', round: true, color: 'green', info: 'Second new Pod.' },
             { id: 'p2c', x: 740, y: 315, w: 120, h: 50, label: 'Pod v2', round: true, color: 'green', info: 'Third new Pod. Rollout complete.' },
@@ -215,10 +215,10 @@ kubectl scale deployment/web --replicas=5`, notes: { 1: 'Changes the Pod templat
         { type: 'cols', ratio: '1fr 1.1fr', cols: [
           [
             { type: 'cards', cols: 1, items: [
-              { icon: '🏷️', color: 'purple', title: 'Stable names', text: 'Pods are named <code>&lt;sts&gt;-0</code>, <code>-1</code>, <code>-2</code>. A replaced Pod gets the <b>same</b> name back.' },
-              { icon: '📛', color: 'blue', title: 'Stable DNS', text: 'Through a <b>headless Service</b> (<code>clusterIP: None</code>): <code>db-0.db.prod.svc.cluster.local</code> always points at Pod 0.' },
-              { icon: '💽', color: 'green', title: 'Stable storage', text: '<code>volumeClaimTemplates</code> give each Pod its own PVC (<code>data-db-0</code>…) that is re-attached to the replacement Pod and kept by default when Pods are deleted.' },
-              { icon: '🔢', color: 'amber', title: 'Ordered', text: 'Default <code>OrderedReady</code>: created 0 → N-1, each Ready before the next; scaled down and deleted in reverse order.' },
+              { icon: 'tag', color: 'purple', title: 'Stable names', text: 'Pods are named <code>&lt;sts&gt;-0</code>, <code>-1</code>, <code>-2</code>. A replaced Pod gets the <b>same</b> name back.' },
+              { icon: 'badge', color: 'blue', title: 'Stable DNS', text: 'Through a <b>headless Service</b> (<code>clusterIP: None</code>): <code>db-0.db.prod.svc.cluster.local</code> always points at Pod 0.' },
+              { icon: 'hard-drive', color: 'green', title: 'Stable storage', text: '<code>volumeClaimTemplates</code> give each Pod its own PVC (<code>data-db-0</code>…) that is re-attached to the replacement Pod and kept by default when Pods are deleted.' },
+              { icon: 'hash', color: 'amber', title: 'Ordered', text: 'Default <code>OrderedReady</code>: created 0 → N-1, each Ready before the next; scaled down and deleted in reverse order.' },
             ] },
           ],
           [
@@ -404,9 +404,9 @@ spec:
       title: 'Liveness, readiness and startup probes',
       blocks: [
         { type: 'flip', items: [
-          { front: '💓 Liveness probe', back: '“Is the process stuck?” On failure the kubelet <b>restarts the container</b>. Catches deadlocks that do not crash the process.' },
-          { front: '🚥 Readiness probe', back: '“Can it serve traffic now?” On failure the Pod is <b>removed from Service endpoints</b>. The container is <b>not</b> restarted. Gates rolling updates.' },
-          { front: '🐢 Startup probe', back: '“Has it finished booting?” Liveness and readiness checks are <b>held off</b> until it succeeds. Protects slow-starting apps from being killed by liveness.' },
+          { front: 'Liveness probe', back: '“Is the process stuck?” On failure the kubelet <b>restarts the container</b>. Catches deadlocks that do not crash the process.' },
+          { front: 'Readiness probe', back: '“Can it serve traffic now?” On failure the Pod is <b>removed from Service endpoints</b>. The container is <b>not</b> restarted. Gates rolling updates.' },
+          { front: 'Startup probe', back: '“Has it finished booting?” Liveness and readiness checks are <b>held off</b> until it succeeds. Protects slow-starting apps from being killed by liveness.' },
         ] },
         { type: 'cols', cols: [
           [

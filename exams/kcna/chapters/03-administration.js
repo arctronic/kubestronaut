@@ -2,7 +2,7 @@ KS.registerChapter('kcna', {
   id: 'administration',
   title: 'Cluster Administration',
   subtitle: 'kubectl, kubeconfig, namespaces, quotas, installing, upgrading and keeping a cluster healthy',
-  icon: '🛠️',
+  icon: 'wrench',
   minutes: 35,
   objectives: [
     'Recognise the everyday kubectl commands and what each one does',
@@ -87,20 +87,20 @@ kubectl explain pod.spec.containers.resources`, notes: { 1: 'The full live objec
       title: 'Clusters, users and contexts',
       blocks: [
         { type: 'diagram', width: 900, height: 400,
-          caption: 'Press ▶ Play to see how kubectl decides where to send a request, or click a box.',
+          caption: 'Press Play to see how kubectl decides where to send a request, or click a box.',
           groups: [
             { x: 190, y: 15, w: 470, h: 370, label: 'kubeconfig file', color: 'amber' },
           ],
           nodes: [
-            { id: 'kubectl', x: 20, y: 170, w: 140, h: 56, label: 'kubectl', icon: '💻', color: 'gray', info: 'Looks for configuration in this order: the <code>--kubeconfig</code> flag, then the <code>KUBECONFIG</code> environment variable (a list of files that are merged), then <code>~/.kube/config</code>.' },
+            { id: 'kubectl', x: 20, y: 170, w: 140, h: 56, label: 'kubectl', icon: 'laptop', color: 'gray', info: 'Looks for configuration in this order: the <code>--kubeconfig</code> flag, then the <code>KUBECONFIG</code> environment variable (a list of files that are merged), then <code>~/.kube/config</code>.' },
             { id: 'cur', x: 210, y: 55, w: 190, h: 56, label: 'current-context', sub: 'dev', color: 'amber', info: 'The context used when you do not pass <code>--context</code>. Changed with <code>kubectl config use-context</code>.' },
             { id: 'ctxa', x: 210, y: 170, w: 190, h: 60, label: 'context: dev', sub: 'cluster + user + ns', color: 'blue', info: 'A context is just a named triple: <b>cluster</b>, <b>user</b> and optionally a default <b>namespace</b>. It holds no credentials itself.' },
             { id: 'ctxb', x: 210, y: 290, w: 190, h: 60, label: 'context: prod', sub: 'cluster + user', color: 'purple', info: 'Selected per command with <code>kubectl --context prod …</code> or permanently with <code>use-context prod</code>.' },
             { id: 'cla', x: 450, y: 55, w: 190, h: 56, label: 'cluster: kind-dev', sub: 'server URL + CA', color: 'green', info: 'A cluster entry holds the API server URL (<code>server</code>) and the CA certificate used to trust it.' },
             { id: 'usr', x: 450, y: 172, w: 190, h: 56, label: 'user: alice', sub: 'cert / token / exec', color: 'pink', info: 'A user entry holds credentials: client certificate and key, a bearer token, or an <code>exec</code> plugin that fetches a token (used by EKS, GKE, AKS and OIDC logins).' },
             { id: 'clb', x: 450, y: 292, w: 190, h: 56, label: 'cluster: prod-eks', sub: 'server URL + CA', color: 'green', info: 'Second cluster in the same file. One kubeconfig can describe many clusters.' },
-            { id: 'apia', x: 700, y: 55, w: 180, h: 56, label: 'API server (dev)', icon: '🚪', color: 'teal', info: 'The request lands here and is authenticated with the user credentials from the context.' },
-            { id: 'apib', x: 700, y: 292, w: 180, h: 56, label: 'API server (prod)', icon: '🚪', color: 'teal', info: 'Switching context points the same kubectl at a completely different cluster. Always check which context is active before deleting things.' },
+            { id: 'apia', x: 700, y: 55, w: 180, h: 56, label: 'API server (dev)', icon: 'door-open', color: 'teal', info: 'The request lands here and is authenticated with the user credentials from the context.' },
+            { id: 'apib', x: 700, y: 292, w: 180, h: 56, label: 'API server (prod)', icon: 'door-open', color: 'teal', info: 'Switching context points the same kubectl at a completely different cluster. Always check which context is active before deleting things.' },
           ],
           edges: [
             { from: 'kubectl', to: 'cur', label: 'reads', color: 'gray' },
@@ -138,10 +138,10 @@ kubectl config view --minify`, notes: { 3: 'Switches current-context: all later 
       blocks: [
         { type: 'text', html: 'A namespace is a <b>scope for names</b> and an attachment point for policy (RBAC, ResourceQuota, LimitRange, NetworkPolicy, Pod Security labels). Names must be unique only within a namespace. Deleting a namespace deletes <b>everything inside it</b>.' },
         { type: 'cards', cols: 2, items: [
-          { icon: '📁', color: 'blue', title: 'default', text: 'Where objects go when you do not specify a namespace.' },
-          { icon: '⚙️', color: 'red', title: 'kube-system', text: 'Objects created by the Kubernetes system: control plane Pods (kubeadm), CoreDNS, kube-proxy, CNI agents.' },
-          { icon: '🌍', color: 'green', title: 'kube-public', text: 'Readable by all clients, including unauthenticated ones. Holds the <code>cluster-info</code> ConfigMap used during bootstrapping.' },
-          { icon: '💓', color: 'amber', title: 'kube-node-lease', text: 'One <b>Lease</b> object per node: the lightweight heartbeat the node controller uses to detect failed nodes.' },
+          { icon: 'folder', color: 'blue', title: 'default', text: 'Where objects go when you do not specify a namespace.' },
+          { icon: 'settings', color: 'red', title: 'kube-system', text: 'Objects created by the Kubernetes system: control plane Pods (kubeadm), CoreDNS, kube-proxy, CNI agents.' },
+          { icon: 'earth', color: 'green', title: 'kube-public', text: 'Readable by all clients, including unauthenticated ones. Holds the <code>cluster-info</code> ConfigMap used during bootstrapping.' },
+          { icon: 'heart-pulse', color: 'amber', title: 'kube-node-lease', text: 'One <b>Lease</b> object per node: the lightweight heartbeat the node controller uses to detect failed nodes.' },
         ] },
         { type: 'callout', kind: 'exam', title: 'Namespaces do not isolate the network', html: 'By default, Pods in different namespaces can reach each other freely. Network isolation needs <b>NetworkPolicies</b>. Across namespaces you reach a Service with its DNS name <code>&lt;svc&gt;.&lt;namespace&gt;.svc.cluster.local</code>.' },
       ],
@@ -201,12 +201,12 @@ spec:
       title: 'Installation options',
       blocks: [
         { type: 'cards', cols: 3, items: [
-          { icon: '🧰', color: 'blue', title: 'kubeadm', text: 'Official tool to bootstrap a conformant cluster: <code>kubeadm init</code> on the first control plane node, <code>kubeadm join</code> on the others. You still provide machines, a runtime and a CNI.' },
-          { icon: '🐳', color: 'teal', title: 'kind', text: '<b>K</b>ubernetes <b>in D</b>ocker: each node is a container. Starts in seconds, supports multi-node; ideal for CI and testing Kubernetes itself.' },
-          { icon: '💻', color: 'green', title: 'minikube', text: 'Local learning/dev cluster in a VM or container on your laptop, with handy add-ons (dashboard, ingress, metrics-server).' },
-          { icon: '🪶', color: 'amber', title: 'k3s', text: 'Lightweight, certified distribution packaged as a single binary. Uses SQLite by default (embedded etcd for HA). Popular for edge, IoT and ARM.' },
-          { icon: '☁️', color: 'purple', title: 'Managed: EKS, GKE, AKS', text: 'The cloud provider runs and upgrades the control plane (including etcd). You manage workloads and, usually, node pools.' },
-          { icon: '🏗️', color: 'gray', title: 'Others', text: 'Kubespray (Ansible playbooks), Cluster API (clusters managed declaratively by another cluster), vendor platforms such as OpenShift and Rancher.' },
+          { icon: 'briefcase', color: 'blue', title: 'kubeadm', text: 'Official tool to bootstrap a conformant cluster: <code>kubeadm init</code> on the first control plane node, <code>kubeadm join</code> on the others. You still provide machines, a runtime and a CNI.' },
+          { icon: 'container', color: 'teal', title: 'kind', text: '<b>K</b>ubernetes <b>in D</b>ocker: each node is a container. Starts in seconds, supports multi-node; ideal for CI and testing Kubernetes itself.' },
+          { icon: 'laptop', color: 'green', title: 'minikube', text: 'Local learning/dev cluster in a VM or container on your laptop, with handy add-ons (dashboard, ingress, metrics-server).' },
+          { icon: 'feather', color: 'amber', title: 'k3s', text: 'Lightweight, certified distribution packaged as a single binary. Uses SQLite by default (embedded etcd for HA). Popular for edge, IoT and ARM.' },
+          { icon: 'cloud', color: 'purple', title: 'Managed: EKS, GKE, AKS', text: 'The cloud provider runs and upgrades the control plane (including etcd). You manage workloads and, usually, node pools.' },
+          { icon: 'construction', color: 'gray', title: 'Others', text: 'Kubespray (Ansible playbooks), Cluster API (clusters managed declaratively by another cluster), vendor platforms such as OpenShift and Rancher.' },
         ] },
         { type: 'compare', headers: ['Need', 'Pick'], rows: [
           ['Throw-away cluster in a CI pipeline', 'kind'],
@@ -245,11 +245,11 @@ spec:
       title: 'Upgrading a kubeadm cluster',
       blocks: [
         { type: 'flow', caption: 'One minor version at a time, control plane first. Click a step.', items: [
-          { icon: '📦', label: 'Upgrade kubeadm', sub: 'first control plane node', info: 'Install the new kubeadm package version on the first control plane node.' },
-          { icon: '🔍', label: 'kubeadm upgrade plan', sub: 'check what is possible', info: 'Verifies the cluster can be upgraded and lists target versions for each component.' },
-          { icon: '🚀', label: 'kubeadm upgrade apply', sub: 'v1.y.z', info: 'Upgrades the static Pod manifests of the API server, controller-manager, scheduler and etcd, plus CoreDNS and kube-proxy add-ons. Other control plane nodes run <code>kubeadm upgrade node</code>.' },
-          { icon: '🤖', label: 'kubelet & kubectl', sub: 'on control plane nodes', info: 'Drain the node, upgrade the kubelet and kubectl packages, restart the kubelet, uncordon.' },
-          { icon: '🧱', label: 'Workers, one by one', sub: 'drain → upgrade → uncordon', info: 'For each worker: <code>kubectl drain</code>, upgrade kubeadm, <code>kubeadm upgrade node</code>, upgrade and restart the kubelet, <code>kubectl uncordon</code>.' },
+          { icon: 'package', label: 'Upgrade kubeadm', sub: 'first control plane node', info: 'Install the new kubeadm package version on the first control plane node.' },
+          { icon: 'search', label: 'kubeadm upgrade plan', sub: 'check what is possible', info: 'Verifies the cluster can be upgraded and lists target versions for each component.' },
+          { icon: 'rocket', label: 'kubeadm upgrade apply', sub: 'v1.y.z', info: 'Upgrades the static Pod manifests of the API server, controller-manager, scheduler and etcd, plus CoreDNS and kube-proxy add-ons. Other control plane nodes run <code>kubeadm upgrade node</code>.' },
+          { icon: 'bot', label: 'kubelet & kubectl', sub: 'on control plane nodes', info: 'Drain the node, upgrade the kubelet and kubectl packages, restart the kubelet, uncordon.' },
+          { icon: 'blocks', label: 'Workers, one by one', sub: 'drain → upgrade → uncordon', info: 'For each worker: <code>kubectl drain</code>, upgrade kubeadm, <code>kubeadm upgrade node</code>, upgrade and restart the kubelet, <code>kubectl uncordon</code>.' },
         ] },
         { type: 'callout', kind: 'warn', title: 'No skipping minors', html: 'Going from 1.31 to 1.33 means two upgrades: 1.31 → 1.32 → 1.33. Skipping a minor version is not supported. Back up etcd before you start.' },
       ],
@@ -351,8 +351,8 @@ metadata:
           ],
         ] },
         { type: 'cards', cols: 2, items: [
-          { icon: '🔌', color: 'teal', title: 'kubectl plugins', text: 'Any executable named <code>kubectl-foo</code> on your PATH becomes <code>kubectl foo</code>. <code>kubectl plugin list</code> shows them.' },
-          { icon: '📦', color: 'purple', title: 'krew', text: 'The plugin manager for kubectl: <code>kubectl krew install ctx ns</code> adds context and namespace switchers.' },
+          { icon: 'plug', color: 'teal', title: 'kubectl plugins', text: 'Any executable named <code>kubectl-foo</code> on your PATH becomes <code>kubectl foo</code>. <code>kubectl plugin list</code> shows them.' },
+          { icon: 'package', color: 'purple', title: 'krew', text: 'The plugin manager for kubectl: <code>kubectl krew install ctx ns</code> adds context and namespace switchers.' },
         ] },
         { type: 'match', title: 'Match the task to the command', pairs: [
           ['Stop new Pods landing on a node', 'kubectl cordon'],

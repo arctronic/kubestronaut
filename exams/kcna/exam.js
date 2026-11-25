@@ -2,7 +2,7 @@
 KS.registerExam({
   id: 'kcna',
   short: 'KCNA',
-  icon: '☸️',
+  icon: 'ship-wheel',
   title: 'Kubernetes and Cloud Native Associate',
   tagline: 'The entry point of the Kubestronaut path: a 90-minute, multiple-choice exam on Kubernetes fundamentals and the wider cloud native ecosystem. Breadth beats depth here.',
   format: '60 multiple-choice Qs',
@@ -43,7 +43,7 @@ KS.registerExam({
   intel: {
     intro: 'Everything about the exam itself: format, blueprint, what past candidates say they were asked, and how to spend your 90 minutes. Candidate reports are summarised from public write-ups (links at the bottom). Never use leaked “dumps”: it breaks the LF candidate agreement and the questions are often wrong.',
     sections: [
-      { icon: '📋', title: 'Format at a glance', blocks: [
+      { icon: 'clipboard-list', title: 'Format at a glance', blocks: [
         { type: 'stats', items: [
           { value: '60', label: 'multiple-choice questions' },
           { value: '90 min', label: 'time limit' },
@@ -59,7 +59,7 @@ KS.registerExam({
           'You have 12 months from purchase to schedule and sit the exam (including the retake).',
         ] },
       ] },
-      { icon: '🗺️', title: 'Official blueprint (current CNCF curriculum)', blocks: [
+      { icon: 'map', title: 'Official blueprint (current CNCF curriculum)', blocks: [
         { type: 'compare', headers: ['Domain', 'Weight', '≈ Questions', 'Subtopics'], rows: [
           ['Kubernetes Fundamentals', '44%', '26', 'Core Concepts · Administration · Scheduling · Containerization'],
           ['Container Orchestration', '28%', '17', 'Networking · Security · Troubleshooting · Storage'],
@@ -68,18 +68,18 @@ KS.registerExam({
         ] },
         { type: 'callout', kind: 'info', title: 'Older guides use different numbers', html: 'Many blogs still show the pre-2025 split (46 / 22 / 16 / 8 / 8, with Observability as its own domain). The current curriculum folds Observability into Cloud Native Architecture and doubles Application Delivery to 16%. This hub follows the current version.' },
       ] },
-      { icon: '🗣️', title: 'What candidates report seeing', blocks: [
+      { icon: 'message-square', title: 'What candidates report seeing', blocks: [
         { type: 'cards', cols: 2, items: [
-          { icon: '🧭', color: 'blue', title: 'Scheduling is tested heavily', text: 'One candidate who scored 87% said there were “many questions” on nodeSelector, node affinity, pod affinity/anti-affinity and taints & tolerations. Know which tool fits which scenario.' },
-          { icon: '🌐', color: 'purple', title: 'CNCF ecosystem trivia surprises people', text: 'Even CKA holders report being caught out by ecosystem questions: project maturity levels, which project does what, CNCF bodies and events. Kubernetes knowledge alone is not enough.' },
-          { icon: '🔭', color: 'amber', title: 'Recognition-level observability', text: 'Expect “which tool” questions: Prometheus (pull-based metrics), OpenTelemetry (vendor-neutral traces, metrics and logs), Jaeger (tracing), Fluentd/Fluent Bit (logs). Don’t confuse OpenMetrics (a format) with OpenTelemetry (a project).' },
-          { icon: '🔁', color: 'green', title: 'GitOps & delivery', text: 'Git as the single source of truth plus a reconciling agent: Argo CD and Flux. Helm and Kustomize appear alongside. Know deployment strategies (rolling, blue/green, canary).' },
-          { icon: '🕸️', color: 'teal', title: 'Service mesh cues', text: 'Keywords “sidecar”, “mTLS”, “east-west traffic” point to a service mesh (Istio, Linkerd, data plane often Envoy).' },
-          { icon: '⏱️', color: 'gray', title: 'Time is rarely the problem', text: 'A candidate with CKA background finished including a full review in about 30 minutes. Use the spare time to re-read every multi-select question.' },
+          { icon: 'compass', color: 'blue', title: 'Scheduling is tested heavily', text: 'One candidate who scored 87% said there were “many questions” on nodeSelector, node affinity, pod affinity/anti-affinity and taints & tolerations. Know which tool fits which scenario.' },
+          { icon: 'globe', color: 'purple', title: 'CNCF ecosystem trivia surprises people', text: 'Even CKA holders report being caught out by ecosystem questions: project maturity levels, which project does what, CNCF bodies and events. Kubernetes knowledge alone is not enough.' },
+          { icon: 'telescope', color: 'amber', title: 'Recognition-level observability', text: 'Expect “which tool” questions: Prometheus (pull-based metrics), OpenTelemetry (vendor-neutral traces, metrics and logs), Jaeger (tracing), Fluentd/Fluent Bit (logs). Don’t confuse OpenMetrics (a format) with OpenTelemetry (a project).' },
+          { icon: 'repeat', color: 'green', title: 'GitOps & delivery', text: 'Git as the single source of truth plus a reconciling agent: Argo CD and Flux. Helm and Kustomize appear alongside. Know deployment strategies (rolling, blue/green, canary).' },
+          { icon: 'network', color: 'teal', title: 'Service mesh cues', text: 'Keywords “sidecar”, “mTLS”, “east-west traffic” point to a service mesh (Istio, Linkerd, data plane often Envoy).' },
+          { icon: 'timer', color: 'gray', title: 'Time is rarely the problem', text: 'A candidate with CKA background finished including a full review in about 30 minutes. Use the spare time to re-read every multi-select question.' },
         ] },
         { type: 'callout', kind: 'exam', title: 'Pattern behind the questions', html: 'Most questions are short scenario or definition items: <i>“Which component…?”, “Which object should you use to…?”, “Which CNCF project…?”, “What does this kubectl command do?”</i>. Wrong options are usually real Kubernetes terms used in the wrong context, so precise definitions matter more than memorising YAML.' },
       ] },
-      { icon: '🪤', title: 'Classic traps', blocks: [
+      { icon: 'triangle-alert', title: 'Classic traps', blocks: [
         { type: 'compare', headers: ['If you see…', 'Remember'], rows: [
           ['“Smallest deployable unit”', 'Pod, not container'],
           ['“Stores cluster state”', 'etcd (only the API server talks to it)'],
@@ -93,7 +93,7 @@ KS.registerExam({
           ['Sandbox → Incubating → Graduated', 'CNCF project maturity levels, in order'],
         ] },
       ] },
-      { icon: '🧰', title: 'Strategy for your 90 minutes', blocks: [
+      { icon: 'briefcase', title: 'Strategy for your 90 minutes', blocks: [
         { type: 'timeline', items: [
           { when: '0–45 min', title: 'First pass', text: 'Answer everything you know immediately. Flag anything you hesitate on for more than ~60 seconds.' },
           { when: '45–70 min', title: 'Flagged pass', text: 'Eliminate options. Look for the one word that makes a distractor wrong (e.g. “encrypts”, “always”, “node” vs “Pod”).' },
@@ -101,7 +101,7 @@ KS.registerExam({
         ] },
         { type: 'callout', kind: 'tip', title: 'Readiness rule of thumb', html: 'Book the exam when you score <b>85%+ on two different mock exams here</b> and every domain is above 75%. That margin absorbs exam-day nerves and unfamiliar wording.' },
       ] },
-      { icon: '✅', title: 'Exam-day checklist', blocks: [
+      { icon: 'circle-check', title: 'Exam-day checklist', blocks: [
         { type: 'bullets', items: [
           'Run the PSI system check on the <b>same computer and network</b> you will use, a day before.',
           'Government photo ID with a name that exactly matches your LF account.',
@@ -110,7 +110,7 @@ KS.registerExam({
           'Launch the exam up to 30 minutes early; check-in and room scan take time.',
         ] },
       ] },
-      { icon: '🔗', title: 'Sources', blocks: [
+      { icon: 'link', title: 'Sources', blocks: [
         { type: 'bullets', items: [
           '<a href="https://github.com/cncf/curriculum" target="_blank" rel="noopener">CNCF curriculum repository (KCNA_Curriculum.pdf)</a>: official domains and weights',
           '<a href="https://training.linuxfoundation.org/certification/kubernetes-cloud-native-associate/" target="_blank" rel="noopener">Linux Foundation KCNA page</a>: format, policies, retake',
@@ -125,13 +125,13 @@ KS.registerExam({
 
   // Your personal library. kind:'page' = local HTML file under exams/kcna/library/, otherwise an external link.
   library: [
-    { group: 'Official', icon: '📄', title: 'KCNA curriculum (CNCF)', url: 'https://github.com/cncf/curriculum', note: 'The source of truth for domains and weights.' },
-    { group: 'Official', icon: '🎓', title: 'KCNA exam page (Linux Foundation)', url: 'https://training.linuxfoundation.org/certification/kubernetes-cloud-native-associate/', note: 'Schedule, policies, candidate handbook.' },
-    { group: 'Official', icon: '📘', title: 'Kubernetes documentation', url: 'https://kubernetes.io/docs/concepts/', note: 'Concepts section maps closely to the Fundamentals domain.' },
-    { group: 'Official', icon: '🗺️', title: 'CNCF Landscape', url: 'https://landscape.cncf.io/', note: 'Browse projects by category and maturity level.' },
-    { group: 'Official', icon: '🏛️', title: 'CNCF projects & maturity', url: 'https://www.cncf.io/projects/', note: 'Graduated, incubating and sandbox project lists.' },
-    { group: 'Official', icon: '📖', title: 'Cloud Native Glossary', url: 'https://glossary.cncf.io/', note: 'Official CNCF definitions. Great for the Architecture domain.' },
-    { group: 'Study aids', icon: '🧾', kind: 'route', title: 'KCNA cheat sheet', url: '#/exam/kcna/cheatsheet', note: 'Every chapter recap and key term on one printable page.' },
-    { group: 'My artifacts', icon: '🧩', kind: 'page', title: 'How to add your own artifacts', url: 'library/README.html', note: 'Save any Claude artifact as an HTML file in exams/kcna/library/ and list it here.' },
+    { group: 'Official', icon: 'file-text', title: 'KCNA curriculum (CNCF)', url: 'https://github.com/cncf/curriculum', note: 'The source of truth for domains and weights.' },
+    { group: 'Official', icon: 'graduation-cap', title: 'KCNA exam page (Linux Foundation)', url: 'https://training.linuxfoundation.org/certification/kubernetes-cloud-native-associate/', note: 'Schedule, policies, candidate handbook.' },
+    { group: 'Official', icon: 'book-open', title: 'Kubernetes documentation', url: 'https://kubernetes.io/docs/concepts/', note: 'Concepts section maps closely to the Fundamentals domain.' },
+    { group: 'Official', icon: 'map', title: 'CNCF Landscape', url: 'https://landscape.cncf.io/', note: 'Browse projects by category and maturity level.' },
+    { group: 'Official', icon: 'landmark', title: 'CNCF projects & maturity', url: 'https://www.cncf.io/projects/', note: 'Graduated, incubating and sandbox project lists.' },
+    { group: 'Official', icon: 'book-open', title: 'Cloud Native Glossary', url: 'https://glossary.cncf.io/', note: 'Official CNCF definitions. Great for the Architecture domain.' },
+    { group: 'Study aids', icon: 'receipt', kind: 'route', title: 'KCNA cheat sheet', url: '#/exam/kcna/cheatsheet', note: 'Every chapter recap and key term on one printable page.' },
+    { group: 'My artifacts', icon: 'puzzle', kind: 'page', title: 'How to add your own artifacts', url: 'library/README.html', note: 'Save any Claude artifact as an HTML file in exams/kcna/library/ and list it here.' },
   ],
 });

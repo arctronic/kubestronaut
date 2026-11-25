@@ -2,7 +2,7 @@ KS.registerChapter('kcna', {
   id: 'scheduling',
   title: 'Scheduling',
   subtitle: 'How the kube-scheduler decides <i>where</i> every Pod runs, and every knob you have to steer it',
-  icon: '🧭',
+  icon: 'compass',
   minutes: 40,
   objectives: [
     'Explain the filter → score → bind cycle and why resource <b>requests</b> (not limits) drive placement',
@@ -19,10 +19,10 @@ KS.registerChapter('kcna', {
       blocks: [
         { type: 'text', html: 'Every new Pod starts with an empty <code>spec.nodeName</code>. The <b>kube-scheduler</b> watches the API server for such Pods, picks the best node for each one, and records the decision by creating a <b>Binding</b>, which sets <code>nodeName</code>. That is all. It never starts containers, pulls images or moves running Pods.' },
         { type: 'cards', items: [
-          { icon: '👀', color: 'blue', title: 'Watches', text: 'Unscheduled Pods (no <code>nodeName</code>) whose <code>schedulerName</code> is <code>default-scheduler</code>.' },
-          { icon: '🧮', color: 'purple', title: 'Decides', text: 'Filters out nodes that cannot run the Pod, scores the rest, picks the highest score.' },
-          { icon: '✍️', color: 'teal', title: 'Binds', text: 'Writes the choice to the API server. The kubelet on that node then starts the Pod.' },
-          { icon: '🚫', color: 'red', title: 'Does not rebalance', text: 'Once bound, a Pod stays put. Moving it means deleting it so a controller creates a new one (or using an add-on such as the Descheduler).' },
+          { icon: 'eye', color: 'blue', title: 'Watches', text: 'Unscheduled Pods (no <code>nodeName</code>) whose <code>schedulerName</code> is <code>default-scheduler</code>.' },
+          { icon: 'calculator', color: 'purple', title: 'Decides', text: 'Filters out nodes that cannot run the Pod, scores the rest, picks the highest score.' },
+          { icon: 'pen-line', color: 'teal', title: 'Binds', text: 'Writes the choice to the API server. The kubelet on that node then starts the Pod.' },
+          { icon: 'ban', color: 'red', title: 'Does not rebalance', text: 'Once bound, a Pod stays put. Moving it means deleting it so a controller creates a new one (or using an add-on such as the Descheduler).' },
         ] },
         { type: 'callout', kind: 'trap', title: 'Classic distractor', html: '“The scheduler looks at actual CPU usage on each node.” <b>False.</b> It compares the Pod’s <b>requests</b> with the node’s <b>allocatable</b> capacity minus the requests of Pods already there. A node at 95% real CPU usage can still accept Pods if their requests fit.' },
       ],
@@ -34,12 +34,12 @@ KS.registerChapter('kcna', {
       title: 'Filter → score → bind',
       blocks: [
         { type: 'diagram', width: 900, height: 420,
-          caption: 'Press ▶ Play to follow one Pod through a scheduling cycle, or click any box.',
+          caption: 'Press Play to follow one Pod through a scheduling cycle, or click any box.',
           groups: [
             { x: 340, y: 20, w: 540, h: 120, label: 'Candidate nodes', color: 'gray' },
           ],
           nodes: [
-            { id: 'pod', x: 20, y: 60, w: 140, h: 56, label: 'New Pod', icon: '🫛', sub: 'nodeName: empty', color: 'blue', round: true, info: 'A Pod created by you or a controller (ReplicaSet, Job…). Its <code>spec.nodeName</code> is empty, so it is <i>Pending</i> and waiting to be scheduled.' },
+            { id: 'pod', x: 20, y: 60, w: 140, h: 56, label: 'New Pod', icon: 'box', sub: 'nodeName: empty', color: 'blue', round: true, info: 'A Pod created by you or a controller (ReplicaSet, Job…). Its <code>spec.nodeName</code> is empty, so it is <i>Pending</i> and waiting to be scheduled.' },
             { id: 'api', x: 20, y: 180, w: 140, h: 56, label: 'kube-apiserver', color: 'blue', info: 'Stores the Pod in etcd. The scheduler and kubelets both <b>watch</b> the API server; they never talk to each other directly.' },
             { id: 'queue', x: 190, y: 180, w: 140, h: 56, label: 'Scheduling\nqueue', sub: 'by priority', color: 'purple', fs: 13, info: 'Pending Pods wait in a queue ordered by <b>priority</b> (from their PriorityClass). Higher-priority Pods are scheduled first.' },
             { id: 'filter', x: 360, y: 180, w: 140, h: 56, label: 'Filter', sub: 'can it run here?', color: 'amber', info: 'Hard rules remove nodes: not enough allocatable CPU/memory for the <b>requests</b>, an untolerated <b>NoSchedule/NoExecute taint</b>, a failing <b>nodeSelector / required node affinity</b>, required pod anti-affinity, a <b>DoNotSchedule</b> spread constraint, volume zone conflicts, host port conflicts.' },
@@ -51,7 +51,7 @@ KS.registerChapter('kcna', {
             { id: 'n4', x: 745, y: 55, w: 120, h: 60, label: 'node-4', sub: 'score 91', color: 'green', info: 'Feasible and highest score. The Pod will be bound here.' },
             { id: 'pre', x: 360, y: 320, w: 140, h: 56, label: 'PostFilter', sub: 'preemption', color: 'amber', info: 'Runs only when <b>no node passed filtering</b>. The default PostFilter plugin tries <b>preemption</b>: evict lower-priority Pods on a node so this Pod fits. The Pod gets <code>status.nominatedNodeName</code> and is retried.' },
             { id: 'pending', x: 190, y: 320, w: 140, h: 56, label: 'Stays Pending', sub: 'FailedScheduling', color: 'red', info: 'If nothing fits and preemption cannot help, the Pod stays <i>Pending</i> and a <b>FailedScheduling</b> event explains why, e.g. “0/4 nodes are available: 2 Insufficient cpu, 2 node(s) had untolerated taint”. It is retried later.' },
-            { id: 'kubelet', x: 700, y: 320, w: 160, h: 56, label: 'kubelet (node-4)', icon: '🤖', color: 'green', info: 'Watches for Pods whose nodeName is its own node, then pulls images and starts containers through the CRI runtime.' },
+            { id: 'kubelet', x: 700, y: 320, w: 160, h: 56, label: 'kubelet (node-4)', icon: 'bot', color: 'green', info: 'Watches for Pods whose nodeName is its own node, then pulls images and starts containers through the CRI runtime.' },
           ],
           edges: [
             { from: 'pod', to: 'api', label: 'create', color: 'blue' },
@@ -218,9 +218,9 @@ affinity:
           ],
           [
             { type: 'cards', cols: 1, items: [
-              { icon: '🧲', color: 'green', title: 'podAffinity', text: 'Co-locate: put the web tier in the same zone (or node) as its cache to cut latency.' },
-              { icon: '↔️', color: 'red', title: 'podAntiAffinity', text: 'Separate: never two replicas of the same app on one node, so a node failure only takes one down.' },
-              { icon: '🗺️', color: 'blue', title: 'topologyKey', text: 'Which node label defines “together”: hostname = node, zone = availability zone, region = region.' },
+              { icon: 'magnet', color: 'green', title: 'podAffinity', text: 'Co-locate: put the web tier in the same zone (or node) as its cache to cut latency.' },
+              { icon: 'arrow-left-right', color: 'red', title: 'podAntiAffinity', text: 'Separate: never two replicas of the same app on one node, so a node failure only takes one down.' },
+              { icon: 'map', color: 'blue', title: 'topologyKey', text: 'Which node label defines “together”: hostname = node, zone = availability zone, region = region.' },
             ] },
           ],
         ] },
@@ -271,10 +271,10 @@ tolerations:
       title: 'Built-in taints and the “toleration ≠ placement” trap',
       blocks: [
         { type: 'flip', items: [
-          { front: '👑 node-role.kubernetes.io/control-plane:NoSchedule', back: 'Set by kubeadm on control plane nodes so regular workloads stay off them. Control plane Pods and some DaemonSets tolerate it.' },
-          { front: '📡 node.kubernetes.io/not-ready & unreachable (NoExecute)', back: 'Added by the Node controller when a node stops reporting. Pods get default tolerations of <b>300 s</b>, which is why Pods on a dead node are evicted after about 5 minutes.' },
-          { front: '💾 memory-pressure / disk-pressure / pid-pressure (NoSchedule)', back: 'Added when the kubelet reports node pressure, so new Pods avoid the struggling node.' },
-          { front: '🚧 node.kubernetes.io/unschedulable:NoSchedule', back: 'Added by <code>kubectl cordon</code> (or drain). Removed by <code>kubectl uncordon</code>.' },
+          { front: 'node-role.kubernetes.io/control-plane:NoSchedule', back: 'Set by kubeadm on control plane nodes so regular workloads stay off them. Control plane Pods and some DaemonSets tolerate it.' },
+          { front: 'node.kubernetes.io/not-ready & unreachable (NoExecute)', back: 'Added by the Node controller when a node stops reporting. Pods get default tolerations of <b>300 s</b>, which is why Pods on a dead node are evicted after about 5 minutes.' },
+          { front: 'memory-pressure / disk-pressure / pid-pressure (NoSchedule)', back: 'Added when the kubelet reports node pressure, so new Pods avoid the struggling node.' },
+          { front: 'node.kubernetes.io/unschedulable:NoSchedule', back: 'Added by <code>kubectl cordon</code> (or drain). Removed by <code>kubectl uncordon</code>.' },
         ] },
         { type: 'callout', kind: 'trap', title: 'A toleration does not force placement', html: 'A toleration only <b>allows</b> a Pod onto a tainted node; the Pod can still land on any untainted node. To dedicate nodes to a workload, combine both: <b>taint</b> the nodes (keep others out) <b>and</b> give the workload <b>node affinity or a nodeSelector</b> (pull it in).' },
         { type: 'compare', headers: ['Goal', 'Use'], rows: [
@@ -348,11 +348,11 @@ spec:
           ],
           [
             { type: 'flow', items: [
-              { icon: '🥇', label: 'Queue order', sub: 'high priority first', info: 'The scheduling queue pops higher-priority Pods first.' },
-              { icon: '❌', label: 'No node fits', sub: 'filter fails', info: 'Every node is filtered out, e.g. Insufficient memory.' },
-              { icon: '🔍', label: 'Find victims', sub: 'lower-priority Pods', info: 'The scheduler looks for a node where evicting some <b>lower-priority</b> Pods would make room. It tries to respect PodDisruptionBudgets but may violate them if there is no other choice.' },
-              { icon: '🪓', label: 'Preempt', sub: 'graceful eviction', info: 'Victims are deleted gracefully. The pending Pod gets <code>nominatedNodeName</code>.' },
-              { icon: '✅', label: 'Schedule', sub: 'next cycle', info: 'When the space is free the Pod is scheduled (not guaranteed onto the nominated node if something better appears).' },
+              { icon: 'medal', label: 'Queue order', sub: 'high priority first', info: 'The scheduling queue pops higher-priority Pods first.' },
+              { icon: 'circle-x', label: 'No node fits', sub: 'filter fails', info: 'Every node is filtered out, e.g. Insufficient memory.' },
+              { icon: 'search', label: 'Find victims', sub: 'lower-priority Pods', info: 'The scheduler looks for a node where evicting some <b>lower-priority</b> Pods would make room. It tries to respect PodDisruptionBudgets but may violate them if there is no other choice.' },
+              { icon: 'axe', label: 'Preempt', sub: 'graceful eviction', info: 'Victims are deleted gracefully. The pending Pod gets <code>nominatedNodeName</code>.' },
+              { icon: 'circle-check', label: 'Schedule', sub: 'next cycle', info: 'When the space is free the Pod is scheduled (not guaranteed onto the nominated node if something better appears).' },
             ] },
             { type: 'callout', kind: 'info', title: 'Built-in classes', html: '<code>system-cluster-critical</code> and <code>system-node-critical</code> exist in every cluster for components such as CoreDNS and the CNI agent.' },
           ],
@@ -366,10 +366,10 @@ spec:
       title: 'DaemonSets, static Pods and custom schedulers',
       blocks: [
         { type: 'cards', items: [
-          { icon: '🐑', color: 'blue', title: 'DaemonSet', text: 'One Pod per (matching) node. The DaemonSet controller creates a Pod per node with a <b>node affinity on that node’s name</b>, and the default scheduler binds it. Use nodeSelector/affinity to target a subset of nodes.' },
-          { icon: '🩹', color: 'green', title: 'Automatic tolerations', text: 'DaemonSet Pods automatically tolerate taints such as <code>not-ready</code>, <code>unreachable</code>, <code>unschedulable</code> and the pressure taints, so node agents keep running on cordoned or unhealthy nodes. The control-plane taint is <b>not</b> tolerated unless you add it.' },
-          { icon: '📄', color: 'amber', title: 'Static Pods', text: 'Run by the kubelet from a local manifest directory. No scheduler involved; the API server only shows a read-only “mirror Pod”.' },
-          { icon: '🧩', color: 'purple', title: 'Custom schedulers', text: 'You can run extra schedulers. A Pod selects one with <code>spec.schedulerName</code>; default is <code>default-scheduler</code>. Typical uses: batch/gang scheduling (e.g. Volcano).' },
+          { icon: 'users', color: 'blue', title: 'DaemonSet', text: 'One Pod per (matching) node. The DaemonSet controller creates a Pod per node with a <b>node affinity on that node’s name</b>, and the default scheduler binds it. Use nodeSelector/affinity to target a subset of nodes.' },
+          { icon: 'bandage', color: 'green', title: 'Automatic tolerations', text: 'DaemonSet Pods automatically tolerate taints such as <code>not-ready</code>, <code>unreachable</code>, <code>unschedulable</code> and the pressure taints, so node agents keep running on cordoned or unhealthy nodes. The control-plane taint is <b>not</b> tolerated unless you add it.' },
+          { icon: 'file-text', color: 'amber', title: 'Static Pods', text: 'Run by the kubelet from a local manifest directory. No scheduler involved; the API server only shows a read-only “mirror Pod”.' },
+          { icon: 'puzzle', color: 'purple', title: 'Custom schedulers', text: 'You can run extra schedulers. A Pod selects one with <code>spec.schedulerName</code>; default is <code>default-scheduler</code>. Typical uses: batch/gang scheduling (e.g. Volcano).' },
         ] },
         { type: 'code', lang: 'yaml', title: 'choose a scheduler', code: `
 spec:
