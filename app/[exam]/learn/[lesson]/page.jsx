@@ -1,6 +1,7 @@
 import LessonDeck from '@/components/LessonDeck';
 import { availableExamIds, examSummary, getChapter, getExam, stripHtml } from '@/lib/content';
-import { SITE_NAME, SITE_URL } from '@/lib/site';
+import JsonLd from '@/components/JsonLd';
+import { SITE_URL, breadcrumbLd, orgLd } from '@/lib/site';
 
 export const dynamicParams = false;
 export function generateStaticParams() {
@@ -21,7 +22,8 @@ export default async function Page({ params }) {
     '@context': 'https://schema.org', '@type': 'LearningResource', name: c.title, description: stripHtml(c.subtitle),
     url: `${SITE_URL}/${exam}/learn/${lesson}/`, learningResourceType: 'Lesson', educationalLevel: 'Beginner', isAccessibleForFree: true, inLanguage: 'en',
     teaches: (c.objectives || []).map(stripHtml), isPartOf: { '@type': 'Course', name: `${e.title} (${e.short})`, url: `${SITE_URL}/${exam}/` },
-    provider: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+    provider: orgLd(), author: orgLd(),
   };
-  return (<><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} /><LessonDeck e={e} ch={ch} /></>);
+  const crumbs = breadcrumbLd([['Home', '/'], [`${e.short} course`, `/${exam}/`], [c.title, `/${exam}/learn/${lesson}/`]]);
+  return (<><JsonLd data={[ld, crumbs]} /><LessonDeck e={e} ch={ch} /></>);
 }

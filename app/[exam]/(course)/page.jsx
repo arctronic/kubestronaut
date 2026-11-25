@@ -1,6 +1,7 @@
 import { CourseMaterial } from '@/components/Course';
+import JsonLd from '@/components/JsonLd';
 import { examSummary, getExam } from '@/lib/content';
-import { SITE_NAME, SITE_URL } from '@/lib/site';
+import { ORG, SITE_URL, breadcrumbLd, orgLd } from '@/lib/site';
 
 export async function generateMetadata({ params }) {
   const { exam } = await params;
@@ -14,12 +15,14 @@ export default async function Page({ params }) {
   const { exam } = await params;
   const e = examSummary(exam);
   const full = getExam(exam);
-  const ld = {
+  const course = {
     '@context': 'https://schema.org', '@type': 'Course', name: `${e.title} (${e.short}) exam preparation`,
     description: full.tagline ? full.tagline.replace(/<[^>]+>/g, '') : e.title, url: `${SITE_URL}/${exam}/`,
-    provider: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL }, isAccessibleForFree: true, inLanguage: 'en',
+    provider: orgLd(), publisher: { '@id': `${ORG.url}/#org` }, isAccessibleForFree: true, inLanguage: 'en',
+    educationalLevel: 'Beginner', teaches: e.domains.map((d) => d.name),
+    offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD', category: 'Free' },
     hasCourseInstance: { '@type': 'CourseInstance', courseMode: 'online', courseWorkload: 'PT10H' },
     syllabusSections: e.chapters.map((c) => ({ '@type': 'Syllabus', name: c.title, url: `${SITE_URL}/${exam}/learn/${c.id}/` })),
   };
-  return (<><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} /><CourseMaterial e={e} /></>);
+  return (<><JsonLd data={[course, breadcrumbLd([['Home', '/'], [`${e.short} course`, `/${exam}/`]])]} /><CourseMaterial e={e} /></>);
 }

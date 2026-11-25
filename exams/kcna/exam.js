@@ -123,6 +123,16 @@ KS.registerExam({
     ],
   },
 
+  // Shown on the exam guide page and published as FAQPage structured data. Keep answers factual.
+  faq: [
+    { q: 'How many questions are on the KCNA exam, and how long is it?', a: 'The KCNA has 60 multiple-choice questions and a 90-minute time limit. Some questions ask you to select more than one answer.' },
+    { q: 'What score do you need to pass the KCNA?', a: 'You need 75% to pass. Wrong answers are not penalised, so never leave a question blank.' },
+    { q: 'What does the KCNA exam cover?', a: 'Four domains from the official CNCF curriculum: Kubernetes Fundamentals (44%), Container Orchestration (28%), Cloud Native Application Delivery (16%) and Cloud Native Architecture (12%).' },
+    { q: 'Is the KCNA a hands-on exam?', a: 'No. The KCNA is an online, remotely proctored multiple-choice exam. The hands-on exams in the Kubestronaut path are the CKAD, CKA and CKS.' },
+    { q: 'Does the KCNA include a free retake, and how long is it valid?', a: 'The exam includes one free retake, and the certification is valid for 2 years.' },
+    { q: 'How should I prepare for the KCNA?', a: 'Work through every domain, then take timed mock exams. A good rule of thumb is to book the exam when you score 85% or more on two different mock exams and every domain is above 75%.' },
+  ],
+
   // Your personal library. kind:'page' = local HTML file under exams/kcna/library/, otherwise an external link.
   library: [
     { group: 'Official', icon: 'file-text', title: 'KCNA curriculum (CNCF)', url: 'https://github.com/cncf/curriculum', note: 'The source of truth for domains and weights.' },

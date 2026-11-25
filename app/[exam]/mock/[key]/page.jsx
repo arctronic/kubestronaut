@@ -1,5 +1,7 @@
 import MockExam from '@/components/Mock';
+import JsonLd from '@/components/JsonLd';
 import { availableExamIds, examSummary, getExam, questionBank } from '@/lib/content';
+import { breadcrumbLd } from '@/lib/site';
 
 export const dynamicParams = false;
 export function generateStaticParams() {
@@ -15,5 +17,7 @@ export async function generateMetadata({ params }) {
 }
 export default async function Page({ params }) {
   const { exam, key } = await params;
-  return <MockExam e={examSummary(exam)} bank={questionBank(exam)} mkey={key} />;
+  const e = examSummary(exam);
+  const name = key === 'random' ? 'Random mock exam' : `Mock exam ${key}`;
+  return (<><JsonLd data={breadcrumbLd([['Home', '/'], [`${e.short} course`, `/${exam}/`], [name, `/${exam}/mock/${key}/`]])} /><MockExam e={e} bank={questionBank(exam)} mkey={key} /></>);
 }
